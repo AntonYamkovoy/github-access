@@ -4,7 +4,7 @@ from pymongo import MongoClient
 
 
 
-client = pymongo.MongoClient("mongodb+srv://Anton:Frozenfire1999@sweng-cqjlw.mongodb.net/test?retryWrites=true&w=majority")
+client = pymongo.MongoClient("mongodb+srv://Anton:mongo@sweng-cqjlw.mongodb.net/test?retryWrites=true&w=majority")
 db = client.sweng_data
 
 posts = db.posts
