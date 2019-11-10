@@ -5,17 +5,26 @@ from pymongo import MongoClient
 
 
 def insert_user(user):
-    name = user.name
+    login = user.login
     location = user.location
-
+    nickname = user.name
+    email = user.email
+    if email is None:
+        email = ""
+    if nickname is None:
+        nickname = ""
     #followers_list = user.followers
     #following_list = user.following
     repositories = user.get_repos()
     # insert user information gathered into db
+    print("inserting user ",user.login)
     db.users.insert_one(
         {
-        "name": name,
-        "location": location
+        "login": login,
+        "name" : nickname,
+        "location": location,
+        "email" : user.email
+
 
          })
     for repo in repositories:
@@ -25,18 +34,10 @@ def insert_user(user):
 
 
 def insert_repo(repo):
-
-
     contributors = repo.get_contributors()
-    for contributor in contributors:
-        db.contributors.insert_one(
-        {
-        "repo"  : repo.name,
-        "contributors": contributor.name
-         })
-
     commits = repo.get_commits()
     for commit in commits:
+            print("inserting commit ",commit.commit.author.name, " ", commit.commit.author.date)
             author = commit.commit.author.name
             datetime = commit.commit.author.date
             additions = commit.stats.additions
@@ -49,30 +50,34 @@ def insert_repo(repo):
              "datatime": datetime,
              "size": {"additions": additions, "deletions": deletions, "total": total}
              })
-
-
-    languages = repo.get_languages()
-    
-    for language in languages:
-        db.language.insert_one(
-        {
-        "repo"  : repo.name,
-        "language": language
-         })
-
+    langList = repo.get_languages()
+    contList = repo.get_contributors()
+    contDict = {}
+    langDict = {}
+    for lang in langList:
+        langDict[lang] = lang
+    for cont in contList:
+        contDict[cont.login] = cont.login
+    print("inserting repo ",repo.name)
     db.repos.insert_one(
         {
+
          "created": repo.created_at,
          "name": repo.name,
-         "description": repo.description
+         "description": repo.description,
+         "language" : langDict,
+         "contributors": contDict
 
      })
+
+
 
 
 client = pymongo.MongoClient("mongodb+srv://Anton:mongo@sweng-cqjlw.mongodb.net/test?retryWrites=true&w=majority")
 g2 = Github("4a78d9e6a5a0602050ccf60acf08cda73c530e96")
 #  4a78d9e6a5a0602050ccf60acf08cda73c530e96 github key
 user = g2.get_user("yungene")
+
 
 #inserting collected data into db
 db = client.sweng_data
@@ -81,6 +86,12 @@ repoData = db.repos
 
 
 insert_user(user)
+
+
+
+
+
+
 
 
 
