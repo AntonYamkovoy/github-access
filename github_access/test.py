@@ -18,11 +18,11 @@ def insert_user(user):
         email = ""
     if nickname is None:
         nickname = ""
-    for f in followers:
-        followers[f.login] = f.login
+    for f in followerList:
+        followers[f.node_id] = (f.login)
 
-    for f in following:
-        following[f.login] = f.login
+    for f in followingList:
+        following[f.login] = (f.login)
 
 
 
