@@ -29,6 +29,10 @@ def insert_user(user):
 
     # insert user information gathered into db
     print("inserting user ",user.login)
+
+
+
+
     db.users.insert_one(
         {
         "login": login,
@@ -40,14 +44,21 @@ def insert_user(user):
 
 
          })
+
+
+
     repositories = user.get_repos()
     for repo in repositories:
-        insert_repo(repo)
+        try:
+            insert_repo(repo)
+        except:
+            print("duplicate repo spotted E11000")
 
 
 
 
 def insert_repo(repo):
+
     contributors = repo.get_contributors()
     commits = repo.get_commits()
     commitDict = {}
@@ -64,9 +75,11 @@ def insert_repo(repo):
     for cont in contList:
         contDict[cont.login] = cont.login
     print("inserting repo ",repo.name)
+
+
     db.repos.insert_one(
         {
-
+         "id": repo.id,
          "created": repo.created_at,
          "name": repo.name,
          "description": repo.description,
@@ -79,10 +92,11 @@ def insert_repo(repo):
 
 
 
+
 client = pymongo.MongoClient("mongodb+srv://Anton:mongo@sweng-cqjlw.mongodb.net/test?retryWrites=true&w=majority")
 g2 = Github("4a78d9e6a5a0602050ccf60acf08cda73c530e96")
 #  4a78d9e6a5a0602050ccf60acf08cda73c530e96 github key
-user = g2.get_user("AntonYamkovoy")
+
 
 
 #inserting collected data into db
@@ -90,8 +104,27 @@ db = client.sweng_data
 userData = db.users
 repoData = db.repos
 
+db.users.create_index(
+    [("login", pymongo.DESCENDING)],
+    unique=True
+)
 
-insert_user(user)
+db.repos.create_index(
+    [("id", pymongo.DESCENDING)],
+    unique=True
+)
+
+usernames = {"AntonYamkovoy","kamilprz","davethedave41","ErnestKz","davethedave41"}
+
+for u in usernames:
+    try:
+        user = g2.get_user(u)
+        insert_user(user)
+    except:
+      print("duplicate user spotted E11000")
+
+
+
 
 
 
