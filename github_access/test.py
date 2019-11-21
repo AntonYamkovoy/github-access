@@ -3,8 +3,9 @@ import pymongo
 from pymongo import MongoClient
 
 
-
 def insert_user(user):
+
+
     login = user.login
     location = user.location
     nickname = user.name
@@ -33,6 +34,8 @@ def insert_user(user):
 
 
 
+
+
     db.users.insert_one(
         {
         "login": login,
@@ -47,13 +50,29 @@ def insert_user(user):
 
 
 
+
     repositories = user.get_repos()
     for repo in repositories:
-        try:
-            insert_repo(repo)
-        except:
-            print("duplicate repo spotted E11000")
+       try:
+           insert_repo(repo)
+       except:
+           print("duplicate repo spotted E11000")
 
+
+
+    for f in followerList:
+            try:
+                insert_user(f)
+            except:
+                print("duplicate user spotted E11000")
+
+
+
+    for f2 in followingList:
+            try:
+                insert_user(f2)
+            except:
+                print("duplicate user spotted E11000")
 
 
 
@@ -77,9 +96,20 @@ def insert_repo(repo):
     print("inserting repo ",repo.name)
 
 
+
+    """    
+    for u in contributors:
+            try:
+                insert_user(u)
+            except:
+                print("duplicate user spotted E11000")
+    """
+
+
+
     db.repos.insert_one(
         {
-         "id": repo.id,
+         "url": repo.url,
          "created": repo.created_at,
          "name": repo.name,
          "description": repo.description,
@@ -87,7 +117,13 @@ def insert_repo(repo):
          "contributors": contDict,
          "commits" : commitDict
 
-     })
+        })
+
+
+
+
+
+
 
 
 
@@ -98,7 +134,7 @@ g2 = Github("4a78d9e6a5a0602050ccf60acf08cda73c530e96")
 #  4a78d9e6a5a0602050ccf60acf08cda73c530e96 github key
 
 
-
+usersList = []
 #inserting collected data into db
 db = client.sweng_data
 userData = db.users
@@ -108,20 +144,19 @@ db.users.create_index(
     [("login", pymongo.DESCENDING)],
     unique=True
 )
-
 db.repos.create_index(
-    [("id", pymongo.DESCENDING)],
+    [("url", pymongo.DESCENDING)],
     unique=True
 )
 
-usernames = {"AntonYamkovoy","kamilprz","davethedave41","ErnestKz","davethedave41"}
+usernames = {"kamilprz"}
 
 for u in usernames:
     try:
         user = g2.get_user(u)
         insert_user(user)
     except:
-      print("duplicate user spotted E11000")
+        print("duplicate user spotted E11000")
 
 
 
