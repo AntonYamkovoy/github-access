@@ -59,6 +59,12 @@ def insert_user(user):
            print("duplicate repo spotted E11000")
 
 
+    for f2 in followingList:
+            try:
+                insert_user(f2)
+            except:
+                print("duplicate following spotted E11000")
+
 
     for f in followerList:
             try:
@@ -68,11 +74,6 @@ def insert_user(user):
 
 
 
-    for f2 in followingList:
-            try:
-                insert_user(f2)
-            except:
-                print("duplicate following spotted E11000")
 
 
 
@@ -89,11 +90,12 @@ def insert_repo(repo):
     contList = repo.get_contributors()
     contDict = {}
     langDict = {}
+    name = repo.name
     for lang in langList:
         langDict[lang] = lang
     for cont in contList:
         contDict[cont.login] = cont.login
-    print("inserting repo ",repo.name)
+    print("inserting repo ",name)
 
 
 
@@ -111,7 +113,7 @@ def insert_repo(repo):
         {
          "url": repo.url,
          "created": repo.created_at,
-         "name": repo.name,
+         "name": name,
          "description": repo.description,
          "language" : langDict,
          "contributors": contDict,
@@ -130,7 +132,7 @@ def insert_repo(repo):
 
 
 client = pymongo.MongoClient("mongodb+srv://Anton:mongo@sweng-cqjlw.mongodb.net/test?retryWrites=true&w=majority")
-g2 = Github("4a78d9e6a5a0602050ccf60acf08cda73c530e96")
+g2 = Github("950c09e4661866e9e71bf1ee7fb8939c3a0b8d41")
 #  4a78d9e6a5a0602050ccf60acf08cda73c530e96 github key
 #950c09e4661866e9e71bf1ee7fb8939c3a0b8d41 sweng 2
 
@@ -150,7 +152,7 @@ db.repos.create_index(
     unique=True
 )
 
-usernames = {"yegor256"}
+usernames = {"conormccauley1999"}
 
 for u in usernames:
     user = g2.get_user(u)
@@ -164,16 +166,10 @@ for u in usernames:
 
 
 
-
-
-
-
-
-
-
-
-
-
+# example queries
+#     { $and: [ { "language.Java": "Java"},  { url : /yungene/ } ] }
+#
+#
 
 
 
