@@ -54,7 +54,7 @@ def insert_user(user):
     repositories = user.get_repos()
     for repo in repositories:
        try:
-           insert_repo(repo)
+               insert_repo(repo)
        except:
            print("duplicate repo spotted E11000")
 
@@ -64,7 +64,7 @@ def insert_user(user):
             try:
                 insert_user(f)
             except:
-                print("duplicate user spotted E11000")
+                print("duplicate follower spotted E11000")
 
 
 
@@ -72,7 +72,7 @@ def insert_user(user):
             try:
                 insert_user(f2)
             except:
-                print("duplicate user spotted E11000")
+                print("duplicate following spotted E11000")
 
 
 
@@ -97,7 +97,7 @@ def insert_repo(repo):
 
 
 
-    """    
+    """
     for u in contributors:
             try:
                 insert_user(u)
@@ -132,6 +132,7 @@ def insert_repo(repo):
 client = pymongo.MongoClient("mongodb+srv://Anton:mongo@sweng-cqjlw.mongodb.net/test?retryWrites=true&w=majority")
 g2 = Github("4a78d9e6a5a0602050ccf60acf08cda73c530e96")
 #  4a78d9e6a5a0602050ccf60acf08cda73c530e96 github key
+#950c09e4661866e9e71bf1ee7fb8939c3a0b8d41 sweng 2
 
 
 usersList = []
@@ -149,14 +150,11 @@ db.repos.create_index(
     unique=True
 )
 
-usernames = {"kamilprz"}
+usernames = {"yegor256"}
 
 for u in usernames:
-    try:
-        user = g2.get_user(u)
-        insert_user(user)
-    except:
-        print("duplicate user spotted E11000")
+    user = g2.get_user(u)
+    insert_user(user)
 
 
 
