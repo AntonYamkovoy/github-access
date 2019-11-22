@@ -132,6 +132,8 @@ def insert_repo(repo):
 
 
 client = pymongo.MongoClient("mongodb+srv://Anton:mongo@sweng-cqjlw.mongodb.net/test?retryWrites=true&w=majority")
+
+
 g2 = Github("950c09e4661866e9e71bf1ee7fb8939c3a0b8d41")
 #  4a78d9e6a5a0602050ccf60acf08cda73c530e96 github key
 #950c09e4661866e9e71bf1ee7fb8939c3a0b8d41 sweng 2
@@ -151,8 +153,8 @@ db.repos.create_index(
     [("url", pymongo.DESCENDING)],
     unique=True
 )
+usernames = {"DarrenKitching"}
 
-usernames = {"conormccauley1999"}
 
 for u in usernames:
     user = g2.get_user(u)
@@ -168,6 +170,7 @@ for u in usernames:
 
 # example queries
 #     { $and: [ { "language.Java": "Java"},  { url : /yungene/ } ] }
+#     {"contributors.AntonYamkovoy": "AntonYamkovoy"}
 #
 #
 
