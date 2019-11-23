@@ -153,7 +153,7 @@ db.repos.create_index(
     [("url", pymongo.DESCENDING)],
     unique=True
 )
-usernames = {"DarrenKitching"}
+usernames = {"ConorClery"}
 
 
 for u in usernames:
