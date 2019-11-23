@@ -31,7 +31,7 @@ def insert_user_mod(user):
             if count > 100:
                 break
             date = commit.commit.author.date
-            if date > datetime.datetime(2017,1,1):
+            if date > datetime.datetime(2017,1,1) | date < datetime.datetime(2019,1,1):
                 try:
 
                     db.devs.insert_one(
@@ -204,7 +204,7 @@ db.commits.create_index(
 )
 
 
-usernames = ["techfort","edgeui"]
+usernames = ["edgeui","walterhiggins","vitaly-t"]
 
 
 for u in usernames:

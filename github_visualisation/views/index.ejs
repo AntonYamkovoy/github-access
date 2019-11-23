@@ -10,29 +10,84 @@
     <div id="vis"></div>
 
     <script type="text/javascript">
+    /*
       var yourVlSpec = {
 
+        "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+    "title": "Temperature over time",
+    "fontsize": "20px",
+    "description": "Drag out a rectangular brush to highlight points.",
+    "data": {"url": "2018_weather.json"},
+    "width":1000, "height":400,
+    "padding": 20,
+
+    "selection": {
+      "brush": {
+        "type": "interval",
+        "init": {"x": [55, 160], "y": [13, 37]}
+      }
+    },
+    "mark": "point",
+    "encoding": {
+      "x": {"field": "date", "type": "temporal",
+      "axis": {"title": "Time"},
+    },
+
+      "y": {"field":   "value", "type": "quantitative",
+      "axis": {"title": "Temperature (Tenth degree celsius)"},
+
+    },
+      "color": {
+        "condition": {"selection": "brush", "field": "id", "type": "ordinal"},
+        "value": "gray"
+
+      }
+    }
+      };
+*/
 
 
+      var yourVlSpec2 = {
 
         "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
-        "data": {
-          "values": [
-            {"key": "alpha", "foo": ["Anton", 2], "bar": ["A", "B"]},
-            {"key": "beta", "foo": [3, 4, 5], "bar": ["C", "D"]}
-          ]
-        },
-        "transform": [{"flatten": ["foo", "bar"]}],
-        "mark": "circle",
-        "encoding": {
-          "x": {"field": "foo", "type": "nominal"},
-          "y": {"field": "bar", "type": "nominal"},
-          "color": {"field": "key", "type": "nominal"}
-        }
+    "title": "Temperature over time",
+    "fontsize": "20px",
+    "description": "Drag out a rectangular brush to highlight points.",
+    "data": {"url": "2018_weather.json"},
+    "width":1000, "height":400,
+    "padding": 20,
 
+    "selection": {
+      "brush": {
+        "type": "interval",
+        "init": {"x": [55, 160], "y": [13, 37]}
+      }
+    },
+    "mark": "point",
+    "encoding": {
+      "x": {"field": "date", "type": "temporal",
+      "axis": {"title": "Time"},
+    },
 
+      "y": {"field":   "value", "type": "quantitative",
+      "axis": {"title": "Temperature (Tenth degree celsius)"},
+
+    },
+      "color": {
+        "condition": {"selection": "brush", "field": "id", "type": "ordinal"},
+        "value": "gray"
+
+      }
+    }
       };
-      vegaEmbed('#vis', yourVlSpec);
+
+
+
+
+
+      //vegaEmbed('#vis', yourVlSpec);
+      vegaEmbed('#vis', yourVlSpec2);
+
     </script>
   </body>
 </html>
