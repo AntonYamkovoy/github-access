@@ -2,7 +2,57 @@ from github import Github
 import pymongo
 from pymongo import MongoClient
 
+import json
+import os
+import datetime
 
+
+
+def reverse_github_results(paginated_list):
+    for i in range(paginated_list.totalCount//30, -1, -1):
+        page = paginated_list.get_page(i)
+        page.reverse()
+        for item in page:
+            yield item
+
+
+def insert_user_mod(user):
+
+    count = 0
+    login = user.login
+
+    repos = user.get_repos()
+
+    for repo in repos:
+        commits = repo.get_commits()
+        reverse_github_results(commits)
+        print("added suitable commits for repo")
+        for commit in commits:
+            if count > 100:
+                break
+            date = commit.commit.author.date
+            if date > datetime.datetime(2017,1,1):
+                try:
+
+                    db.devs.insert_one(
+                            {
+                             "login": login,
+                             "date" : date,
+                             "size" : commit.stats.total
+
+                            })
+                    count += 1
+                except:
+                    print("some error")
+        count =0
+
+
+
+
+
+
+
+""""
 def insert_user(user):
 
 
@@ -76,10 +126,10 @@ def insert_user(user):
 
 
 
-
+"""
+"""
 def insert_repo(repo):
 
-    contributors = repo.get_contributors()
     commits = repo.get_commits()
     commitDict = {}
 
@@ -98,17 +148,6 @@ def insert_repo(repo):
     print("inserting repo ",name)
 
 
-
-    """
-    for u in contributors:
-            try:
-                insert_user(u)
-            except:
-                print("duplicate user spotted E11000")
-    """
-
-
-
     db.repos.insert_one(
         {
          "url": repo.url,
@@ -121,7 +160,7 @@ def insert_repo(repo):
 
         })
 
-
+"""
 
 
 
@@ -139,7 +178,11 @@ g2 = Github("950c09e4661866e9e71bf1ee7fb8939c3a0b8d41")
 #950c09e4661866e9e71bf1ee7fb8939c3a0b8d41 sweng 2
 
 
-usersList = []
+
+
+
+
+
 #inserting collected data into db
 db = client.sweng_data
 userData = db.users
@@ -153,12 +196,22 @@ db.repos.create_index(
     [("url", pymongo.DESCENDING)],
     unique=True
 )
-usernames = {"ConorClery"}
+
+db.commits.create_index(
+        [("sha", pymongo.DESCENDING)],
+        unique=True
+
+)
+
+
+usernames = ["techfort","edgeui"]
 
 
 for u in usernames:
     user = g2.get_user(u)
-    insert_user(user)
+    insert_user_mod(user)
+
+
 
 
 
