@@ -22,6 +22,8 @@ var chart_json;
 const app = express()
 
 
+makeGraphData("flutter-webrtc","cloudwebrtc",commit_list);
+
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs')
@@ -111,7 +113,7 @@ function makeGraphData(repo, login, commit_list) {
 
   }
   else if(repo.trim() == "All") {
-    
+
 
 
   }
@@ -122,6 +124,29 @@ function makeGraphData(repo, login, commit_list) {
   }
   else {
     // repo and login are single values case
+    var dataArray = []
+    var nodes = []
+    var links = []
+
+    nodes.push({"name":login, "group": 0});
+    nodes.push({"name":repo, "group": 1});
+
+    links.push({"source": 0, "target": 1, "value": 1});
+
+
+
+    dataArray.push({"nodes":nodes, "links": links});
+
+
+
+
+
+    var dataArray = dataArray[0];
+    let dataJSON = JSON.stringify(dataArray);
+    fs.writeFileSync('test1.json', dataJSON);
+
+
+
 
 
   }
