@@ -159,9 +159,9 @@ function makeGraphData(repo, login, commit_list,repo_contributors) {
 
 
       dataArray = dataArray[0];
-   let dataJSON = JSON.stringify(dataArray);
-   fs.writeFileSync('test2.json', dataJSON);
-    //  graph_json = dataArray;
+   //let dataJSON = JSON.stringify(dataArray);
+   //fs.writeFileSync('test2.json', dataJSON);
+     graph_json = dataArray;
 
 
   }
