@@ -10,7 +10,8 @@
     <div id="vis"></div>
 
     <script type="text/javascript">
-    /*
+
+/*
       var yourVlSpec = {
 
         "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
@@ -18,7 +19,7 @@
     "fontsize": "20px",
     "description": "Drag out a rectangular brush to highlight points.",
     "data": {"url": "2018_weather.json"},
-    "width":1000, "height":400,
+    "width":1200, "height":600,
     "padding": 20,
 
     "selection": {
@@ -44,49 +45,58 @@
       }
     }
       };
+
 */
 
+  var yourVlSpec2 = {
 
-      var yourVlSpec2 = {
+    "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+      "data": {"url": "seattle-weather.csv"},
+      "mark": "bar",
+      "encoding": {
+        "x": {
+          "timeUnit": "month",
+          "field": "date",
+          "type": "ordinal",
+          "axis": {"title": "Month of the year"}
+        },
+        "y": {
+          "aggregate": "count",
+          "type": "quantitative"
+        },
+        "color": {
+          "field": "weather",
+          "type": "ordinal",
 
-        "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
-    "title": "Temperature over time",
-    "fontsize": "20px",
-    "description": "Drag out a rectangular brush to highlight points.",
-    "data": {"url": "2018_weather.json"},
-    "width":1000, "height":400,
-    "padding": 20,
+          "scale": {
 
-    "selection": {
-      "brush": {
-        "type": "interval",
-        "init": {"x": [55, 160], "y": [13, 37]}
+            //"domain": ["sun", "fog", "drizzle", "rain", "snow"],
+          //  "range": ["#ff0000","#9467bd"]
+
+
+          },
+
+          "legend": {"title": "Weather type"}
+        }
       }
-    },
-    "mark": "point",
-    "encoding": {
-      "x": {"field": "date", "type": "temporal",
-      "axis": {"title": "Time"},
-    },
-
-      "y": {"field":   "value", "type": "quantitative",
-      "axis": {"title": "Temperature (Tenth degree celsius)"},
-
-    },
-      "color": {
-        "condition": {"selection": "brush", "field": "id", "type": "ordinal"},
-        "value": "gray"
-
-      }
-    }
-      };
 
 
+};
 
 
+/*
 
-      //vegaEmbed('#vis', yourVlSpec);
-      vegaEmbed('#vis', yourVlSpec2);
+var projection = d3.geo.albers()
+    .center([0, 55.4])
+    .rotate([4.4, 0])
+    .parallels([50, 60])
+    .scale(6000)
+    .translate([width / 2, height / 2]);
+*/
+
+        vegaEmbed('#vis', yourVlSpec2);
+        //vegaEmbed('#vis', yourVlSpec2);
+
 
     </script>
   </body>

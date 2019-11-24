@@ -7,6 +7,13 @@ import os
 import datetime
 
 
+lat = 0
+long = 0
+
+
+
+
+
 
 def reverse_github_results(paginated_list):
     for i in range(paginated_list.totalCount//30, -1, -1):
@@ -14,39 +21,6 @@ def reverse_github_results(paginated_list):
         page.reverse()
         for item in page:
             yield item
-
-
-def insert_user_mod(user):
-
-    count = 0
-    login = user.login
-
-    repos = user.get_repos()
-
-    for repo in repos:
-        commits = repo.get_commits()
-        reverse_github_results(commits)
-        print("added suitable commits for repo")
-        for commit in commits:
-            if count > 100:
-                break
-            date = commit.commit.author.date
-            if date > datetime.datetime(2017,1,1) | date < datetime.datetime(2019,1,1):
-                try:
-
-                    db.devs.insert_one(
-                            {
-                             "login": login,
-                             "date" : date,
-                             "size" : commit.stats.total
-
-                            })
-                    count += 1
-                except:
-                    print("some error")
-        count =0
-
-
 
 
 
@@ -164,8 +138,55 @@ def insert_repo(repo):
 
 
 
+def insert_repo(repo):
+    name = repo.name
+    try:
+        db.repos_new.insert_one({ "name" : name })
+    except:
+        print("error inserting repo ", name)
 
 
+
+    languages = repo.get_languages()
+    contributors = repo.get_contributors()
+    commits = repo.get_commits()
+    for lang in languages:
+        insert_language(lang,name)
+    for commit in commits:
+        insert_commit(commit,name)
+    for contributor in contributors:
+        insert_user(contributor)
+
+
+def insert_language(lang,name):
+    try:
+        db.languages_new.insert_one({  "name" : name,"language" : lang  })
+    except:
+        print("inserting lang error ",name, " ",lang)
+
+
+
+def insert_user(contributor):
+    try:
+        db.users_new.insert_one({ "login" : contributor.login })
+    except:
+        print("error ins user ", contributor)
+
+
+def insert_commit(commit,name):
+    try:
+        if commit.author is not None:
+            date_time = commit.commit.author.date.strftime("%Y:%m:%d:%H:%M:%S")
+            print("date ",date_time)
+            print("commit author ", commit.author.login)
+            db.commits_new.insert_one({ "login" : commit.author.login,  "repo_name" : name, "date": date_time, "sha": commit.sha  })
+        else:
+            print("inserting commit error", commit.commit.author.name)
+    except:
+        print(" error in commit ",commit)
+
+
+reposList = ["flutter-webrtc","flutter_barcode_reader","flutter-nfc-reader","flutterlocation","admob_flutter"]
 
 
 
@@ -173,7 +194,7 @@ def insert_repo(repo):
 client = pymongo.MongoClient("mongodb+srv://Anton:mongo@sweng-cqjlw.mongodb.net/test?retryWrites=true&w=majority")
 
 
-g2 = Github("950c09e4661866e9e71bf1ee7fb8939c3a0b8d41")
+g2 = Github("4a78d9e6a5a0602050ccf60acf08cda73c530e96")
 #  4a78d9e6a5a0602050ccf60acf08cda73c530e96 github key
 #950c09e4661866e9e71bf1ee7fb8939c3a0b8d41 sweng 2
 
@@ -185,31 +206,57 @@ g2 = Github("950c09e4661866e9e71bf1ee7fb8939c3a0b8d41")
 
 #inserting collected data into db
 db = client.sweng_data
-userData = db.users
-repoData = db.repos
+userData = db.users_new
+repoData = db.repos_new
+commitsData = db.commits_new
+langData = db.languages_new
 
-db.users.create_index(
+db.users_new.create_index(
     [("login", pymongo.DESCENDING)],
     unique=True
 )
-db.repos.create_index(
-    [("url", pymongo.DESCENDING)],
+
+
+db.repos_new.create_index(
+    [("name", pymongo.DESCENDING)],
     unique=True
 )
 
-db.commits.create_index(
-        [("sha", pymongo.DESCENDING)],
-        unique=True
-
+"""
+db.commits_new.create_index(
+    [("login", pymongo.DESCENDING),("date", pymongo.DESCENDING)],
+    unique=True
+)
+"""
+db.commits_new.create_index(
+    [("sha", pymongo.DESCENDING)],
+    unique=True
 )
 
 
-usernames = ["edgeui","walterhiggins","vitaly-t"]
+
+db.languages_new.create_index(
+    [("name", pymongo.DESCENDING),("language", pymongo.DESCENDING)],
+    unique=True
+)
 
 
-for u in usernames:
-    user = g2.get_user(u)
-    insert_user_mod(user)
+
+
+
+
+
+
+
+
+reposList = ["cloudwebrtc/flutter-webrtc","apptreesoftware/flutter_barcode_reader","matteocrippa/flutter-nfc-reader","Lyokone/flutterlocation","kmcgill88/admob_flutter"]
+
+
+
+for str in reposList:
+    repo = g2.get_repo(str)
+    print("adding repo ",str )
+    insert_repo(repo)
 
 
 
