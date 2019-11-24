@@ -8,12 +8,14 @@ let langData= fs.readFileSync('data/lang.json');
 let reposData = fs.readFileSync('data/repos.json');
 let userData = fs.readFileSync('data/users.json');
 let commitData = fs.readFileSync('data/commits.json');
+let repo_contributors = fs.readFileSync('data/repo_contributors.json');
 
 
 let lang_list = JSON.parse(langData);
 let repo_list = JSON.parse(reposData);
 let user_list = JSON.parse(userData);
 let commit_list = JSON.parse(commitData);
+let repo_cont = JSON.parse(repo_contributors);
 var chart_json;
 
 
@@ -22,7 +24,7 @@ var chart_json;
 const app = express()
 
 
-makeGraphData("flutter-webrtc","cloudwebrtc",commit_list);
+makeGraphData("flutter-webrtc","All",commit_list,repo_cont);
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -105,8 +107,10 @@ function makeChartData(repo, login, commit_list) {
 }
 
 
-function makeGraphData(repo, login, commit_list) {
+function makeGraphData(repo, login, commit_list,repo_contributors) {
   var graph_json;
+
+
   if(repo.trim() == "All" && login.trim() == "All") { // removing extra whitespace for comparison
       // add all user logins as Node(user), add all repos as Repo(user)
       // for each commit to a repo add a link source : commit.login,  target = commit.repo_name, value
@@ -118,11 +122,57 @@ function makeGraphData(repo, login, commit_list) {
 
   }
   else if(login.trim() == "All") {
-    // all users 1 repo case
+    var dataArray = []
+    var nodes = []
+    var links = []
+
+    var commitList = []
+    var count =0;
+    var count2 =0;
+    var index = repo_contributors.length;
+    while(index--) {
+      if(repo_contributors[index].repo_name == repo) {
+          // found user that commits in given repo
+
+          for(var key in commit_list) {
+            if(commit_list[key].login== repo_contributors[index].login && commit_list[key].repo_name == repo) {
+              // found users commit in given repo
+              count2++;
+
+            }
+
+          }
+
+          commitList[count] = count2;
+          count2 =0
+
+
+          nodes.push({"name": repo_contributors[index].login , "group": 0});
+          count++;
+      }
+
+    }
+    console.log(count)
+    nodes.push({"name":repo, "group": 1});
+      // finished pushing all nodes, there are |count| nodes + 1 (the repo)
+    for(var i = 0; i < count ; i++) {
+        links.push({"source":i, "target":count, "value":commitList[i]});
+    }
+
+    dataArray.push({"nodes": nodes, "links": links});
+
+
+      dataArray = dataArray[0];
+  //  let dataJSON = JSON.stringify(dataArray);
+  //  fs.writeFileSync('test2.json', dataJSON);
+      graph_json = dataArray;
+
+
 
 
   }
   else {
+
     // repo and login are single values case
     var dataArray = []
     var nodes = []
@@ -133,20 +183,14 @@ function makeGraphData(repo, login, commit_list) {
 
     links.push({"source": 0, "target": 1, "value": 1});
 
-
-
     dataArray.push({"nodes":nodes, "links": links});
 
-
-
-
-
     var dataArray = dataArray[0];
-    let dataJSON = JSON.stringify(dataArray);
-    fs.writeFileSync('test1.json', dataJSON);
 
+  //  let dataJSON = JSON.stringify(dataArray);
+  // fs.writeFileSync('test1.json', dataJSON);
 
-
+    graph_json = dataArray;
 
 
   }
