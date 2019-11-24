@@ -1,25 +1,86 @@
+
+
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Embedding Vega</title>
+    <meta charset="utf-8">
+    <title>Anton Yamkovoy: Software Engeneering Demo Project</title>
     <script src="https://cdn.jsdelivr.net/npm/vega@5.8.1"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@4.0.0-beta.12"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.1.0"></script>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
   </head>
   <body>
+    <div id="info">
+      We got data from GitHub ....
+
+    </div>
+    <fieldset>
+    <form action="/" method="post">
+    <div id="filters" class="filters-class">
+          <label for="lang">Language</label>
+           <select id="lang" name="lang" size="1" width="20">
+             <option value = "All" >All Languages </option>
+             <% langList.forEach((item) => { %>
+               <option value = "<%= item.lang %>"> <%= item.lang %></option>
+             <% }); %>
+       </select>
+      <label for="repo">Repository</label>
+      <select id="repo" name="repo" size="1" width="40">
+        <option value = "All" >All repos </option>
+        <% reposList.forEach((item) => { %>
+          <option value = "<%= item.repo_name %>"> <%= item.repo_name %></option>
+        <% }); %>
+      </select>
+      <label for="user">User</label>
+      <select id="user" name="user" size="1" width="40">
+        <option value = "All" >All users</option>
+        <% userList.forEach((item) => { %>
+          <option value = "<%= item.login %>"> <%= item.login %></option>
+        <% }); %>
+      </select>
+      <input type="submit" class="go-button" value="Update">
+      </form>
+    </fieldset>
+    </div>
+    <div id="chart"></div>
+
     <div id="vis"></div>
 
     <script type="text/javascript">
 
+
 /*
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Test</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+  </head>
+  <body>
+    <div class="container">
+      <fieldset>
+        <form action="/" method="post">
+          <input name="city" type="text" class="ghost-input" placeholder="Enter a City" required>
+          <input type="submit" class="ghost-button" value="Get Weather">
+        </form>
+      </fieldset>
+    </div>
+  </body>
+</html>
+*/
+
+
       var yourVlSpec = {
 
         "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
     "title": "Temperature over time",
     "fontsize": "20px",
     "description": "Drag out a rectangular brush to highlight points.",
-    "data": {"url": "2018_weather.json"},
-    "width":1200, "height":600,
+    "data": {"url": "data/2018_weather.json"},
+    "width":700, "height":400,
     "padding": 20,
 
     "selection": {
@@ -44,60 +105,58 @@
 
       }
     }
-      };
 
-*/
+  };
+
+
 
   var yourVlSpec2 = {
 
+
     "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
-      "data": {"url": "seattle-weather.csv"},
-      "mark": "bar",
-      "encoding": {
-        "x": {
-          "timeUnit": "month",
-          "field": "date",
-          "type": "ordinal",
-          "axis": {"title": "Month of the year"}
+    "width":700, "height":400, "padding": 20,
+    "data": {"url": "data/seattle-weather.csv"},
+    "mark": "bar",
+
+    "encoding": {
+      "x": {
+        "timeUnit": "month",
+        "field": "date",
+        "type": "ordinal",
+        "axis": {"title": "Month of the year"}
+      },
+      "y": {
+        "aggregate": "count",
+        "type": "quantitative"
+      },
+      "color": {
+        "field": "weather",
+        "type": "nominal",
+        "scale": {
+          "domain": ["sun", "fog", "drizzle", "rain", "snow"],
+          "range": ["#e7ba52", "#c7c7c7", "#aec7e8", "#1f77b4", "#9467bd"]
         },
-        "y": {
-          "aggregate": "count",
-          "type": "quantitative"
-        },
-        "color": {
-          "field": "weather",
-          "type": "ordinal",
-
-          "scale": {
-
-            //"domain": ["sun", "fog", "drizzle", "rain", "snow"],
-          //  "range": ["#ff0000","#9467bd"]
-
-
-          },
-
-          "legend": {"title": "Weather type"}
-        }
+        "legend": {"title": "Weather type"}
       }
+    }
 
 
 };
 
 
-/*
-
-var projection = d3.geo.albers()
-    .center([0, 55.4])
-    .rotate([4.4, 0])
-    .parallels([50, 60])
-    .scale(6000)
-    .translate([width / 2, height / 2]);
-*/
 
         vegaEmbed('#vis', yourVlSpec2);
+        vegaEmbed('#chart', yourVlSpec);
         //vegaEmbed('#vis', yourVlSpec2);
 
 
     </script>
   </body>
+
+  <style>
+
+
+  </style>
+
+
 </html>

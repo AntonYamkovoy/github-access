@@ -136,6 +136,15 @@ def insert_repo(repo):
 
 """
 
+def get_links(string):
+    user = g2.get_user(string)
+    repos = user.get_repos()
+    #print(user.name)
+    for r in repos:
+        string = user.login+"/"+r.name
+        db.repo_links.insert_one({ "link" : string })
+
+
 
 
 def insert_repo(repo):
@@ -210,6 +219,7 @@ userData = db.users_new
 repoData = db.repos_new
 commitsData = db.commits_new
 langData = db.languages_new
+repList = db.repo_links
 
 db.users_new.create_index(
     [("login", pymongo.DESCENDING)],
@@ -233,6 +243,11 @@ db.commits_new.create_index(
     unique=True
 )
 
+db.repo_links.create_index(
+    [("link", pymongo.DESCENDING)],
+    unique=True
+)
+
 
 
 db.languages_new.create_index(
@@ -248,15 +263,36 @@ db.languages_new.create_index(
 
 
 
+"""
 
-reposList = ["cloudwebrtc/flutter-webrtc","apptreesoftware/flutter_barcode_reader","matteocrippa/flutter-nfc-reader","Lyokone/flutterlocation","kmcgill88/admob_flutter"]
+userList= []
+query = db.users_new.find()
+for i in query:
+    userList.append(i["login"])
 
 
+"""
 
-for str in reposList:
+"""
+for userStr in userList:
+    try:
+        get_links(userStr)
+    except:
+        print("error links",user)
+
+"""
+linksList = []
+queryLinks = db.repo_links.find()
+for i in queryLinks:
+    linksList.append(i["link"])
+
+
+for str in linksList:
     repo = g2.get_repo(str)
     print("adding repo ",str )
     insert_repo(repo)
+
+
 
 
 
