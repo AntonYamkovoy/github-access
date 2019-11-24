@@ -24,7 +24,7 @@ var chart_json;
 const app = express()
 
 
-makeGraphData("flutter-webrtc","All",commit_list,repo_cont);
+makeGraphData("All","cloudwebrtc",commit_list,repo_cont);
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -117,7 +117,51 @@ function makeGraphData(repo, login, commit_list,repo_contributors) {
 
   }
   else if(repo.trim() == "All") {
+    var dataArray = []
+    var nodes = []
+    var links = []
 
+    var commitList = []
+    var count =0;
+    var count2 =0;
+    var index = repo_contributors.length;
+    nodes.push({"name":login, "group": 0});
+    while(index--) {
+      if(repo_contributors[index].login == login) {
+          // found repo of given
+
+          for(var key in commit_list) {
+            if(commit_list[key].repo_name == repo_contributors[index].repo_name && commit_list[key].login == login) {
+              // found users commit in given repo
+              count2++;
+
+            }
+
+          }
+
+          commitList[count] = count2;
+          count2 =0
+
+
+          nodes.push({"name": repo_contributors[index].repo_name , "group": 1});
+          count++;
+      }
+
+    }
+    console.log(count)
+
+      // finished pushing all nodes, there are |count| nodes + 1 (the repo)
+    for(var i = 1; i <= count ; i++) {
+        links.push({"source":0, "target":i, "value":commitList[i-1]});
+    }
+
+    dataArray.push({"nodes": nodes, "links": links});
+
+
+      dataArray = dataArray[0];
+   let dataJSON = JSON.stringify(dataArray);
+   fs.writeFileSync('test2.json', dataJSON);
+    //  graph_json = dataArray;
 
 
   }
