@@ -25,18 +25,18 @@
              <% langList.forEach((item) => { %>
                <option value = "<%= item.lang %>"> <%= item.lang %></option>
              <% }); %>
-       </select>
-      <label for="repo">Repository</label>
-      <select id="repo" name="repo" size="1" width="40">
-        <option value = "All" >All repos </option>
-        <% reposList.forEach((item) => { %>
+           </select>
+          <label for="repo">Repository</label>
+           <select id="repo" name="repo" size="1" width="40" onchange="getRepoSelection()">
+            <option value = "All" >All repos </option>
+            <% reposList.forEach((item) => { %>
           <option value = "<%= item.repo_name %>"> <%= item.repo_name %></option>
         <% }); %>
-      </select>
+         </select>
       <label for="user">User</label>
       <select id="user" name="user" size="1" width="40">
         <option value = "All" >All users</option>
-        <% userList.forEach((item) => { %>
+          <% userList.forEach((item) => { %>
           <option value = "<%= item.login %>"> <%= item.login %></option>
         <% }); %>
       </select>
@@ -261,8 +261,8 @@
 
 
 
-        vegaEmbed('#vis', yourVlSpec);
-        vegaEmbed('#chart', yourVlSpec2);
+      //  vegaEmbed('#vis', yourVlSpec);
+      //  vegaEmbed('#chart', yourVlSpec2);
 
 
 
@@ -281,17 +281,17 @@
 
 
 
-        function getUserSelection() {
-            user = document.getElementById("user").login;
-            loadRepos(user);
+        function getRepoSelection() {
+            repo = document.getElementById("repo").value;
+            loadUsers(repo);
         }
-        function loadRepos(lang) {
+        function loadUsers(repo) {
         var myarray = new Array();
-        $.getJSON("repolang?lang="+lang, function(jsonData){
-          document.form.repo.options.length = 0;
-          document.form.repo.options[0] = new Option("All repos    ","All",true, false);
+        $.getJSON("repouser?repo="+repo, function(jsonData){
+          document.form.user.options.length = 0;
+          document.form.user.options[0] = new Option("All users    ","All",true, false);
          $.each(jsonData, function(i,j)
-        { document.form.repo.options[i+1] = new Option(j.repo_name); });});
+        { document.form.user.options[i+1] = new Option(j.login); });});
         }
 
 

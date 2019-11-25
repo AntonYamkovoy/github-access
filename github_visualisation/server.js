@@ -27,7 +27,7 @@ var graph_json;
 
 //console.log(langList);
 const app = express()
-
+//makeUserData("11LiveChat",user_list,repo_cont); //working
 // make repo list filtered by lang
 //makeLangData("All",repo_list,repo_langs);
 //makeLangData("Go",repo_list,repo_langs);
@@ -49,13 +49,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs')
 
 app.get('/', function (req, res) {
-  chart_json = makeChartData("All","All",commit_list);
-  graph_json = makeGraphData("All","All",commit_list,repo_cont,repo_list,user_list);
+//  chart_json = makeChartData("All","All",commit_list);
+  //graph_json = makeGraphData("All","All",commit_list,repo_cont,repo_list,user_list);
   res.render('index', {langList: lang_list,reposList:repo_list,userList:user_list});
 })
 app.post('/', function (req, res) {
   chart_json = makeChartData("All","All",commit_list);
-  graph_json = makeGraphData("11LiveChat","All",commit_list,repo_cont,repo_list,user_list);
+  graph_json = makeGraphData("All","All",commit_list,repo_cont,repo_list,user_list);
   res.render('index', {langList: lang_list,reposList:repo_list,userList:user_list});
 })
 app.get('/chart', function(req,res){
@@ -72,10 +72,46 @@ app.get('/repolang', function(req,res){
   res.json(makeLangData(param.lang,repo_list,repo_langs));
 })
 
+app.get('/repouser', function(req,res){
+  param = get_param(req);
+  console.log(param.repo);
+  res.json(makeUserData(param.repo, user_list, repo_cont));
+})
+
 
 app.listen(3000, function () {
   console.log('Example app listening on port 3000!')
 })
+
+
+function makeUserData(repo,user_list,repo_contributors) {
+  var dataArray = []
+  if(repo == "All") {
+    for(var key in user_list) {
+      dataArray.push({"login":user_list[key].login});
+    }
+
+  }
+  else {
+
+    for(var key2 in repo_contributors) {
+        if(repo_contributors[key2].repo_name == repo) {
+
+              dataArray.push({"login":repo_contributors[key2].login});
+        }
+
+    }
+
+
+
+  }
+  let dataJSON = JSON.stringify(dataArray);
+//  fs.writeFileSync('testUsers.json', dataJSON);
+  return dataArray;
+
+
+}
+
 
 // returns a list of repos for a given language
 function makeLangData(language,repo_list,repo_langs) {
@@ -99,7 +135,7 @@ function makeLangData(language,repo_list,repo_langs) {
 
   //  var dataArray2 = dataArray[0];
     let dataJSON = JSON.stringify(dataArray);
-    fs.writeFileSync('testLang.json', dataJSON);
+    //fs.writeFileSync('testLang.json', dataJSON);
     return dataArray;
 
 
