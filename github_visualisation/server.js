@@ -9,11 +9,12 @@ let reposData = fs.readFileSync('data/repos.json');
 let userData = fs.readFileSync('data/users.json');
 let commitData = fs.readFileSync('data/commits.json');
 let repo_contributors = fs.readFileSync('data/repo_contributors.json');
+let repo_lang = fs.readFileSync('data/repo_lang.json');
 
 
 
 
-
+let repo_langs = JSON.parse(repo_lang);
 let lang_list = JSON.parse(langData);
 let repo_list = JSON.parse(reposData);
 let user_list = JSON.parse(userData);
@@ -26,8 +27,21 @@ var chart_json;
 //console.log(langList);
 const app = express()
 
+// make repo list filtered by lang
+//makeLangData("All",repo_list,repo_langs);
+//makeLangData("Go",repo_list,repo_langs);
 
-makeGraphData("All","All",commit_list,repo_cont,repo_list,user_list);
+// Make graph all test cases working
+//makeGraphData("All","All",commit_list,repo_cont,repo_list,user_list);
+//makeGraphData("All","cloudwebrtc",commit_list,repo_cont,repo_list,user_list);
+//makeGraphData("11LiveChat","All",commit_list,repo_cont,repo_list,user_list);
+//makeGraphData("11LiveChat","cloudwebrtc",commit_list,repo_cont,repo_list,user_list);
+
+//Make Chart all test cases
+//makeChartData("All","All",commit_list);
+//makeChartData("All","cloudwebrtc",commit_list);
+//makeChartData("11LiveChat","All",commit_list);
+//makeChartData("11LiveChat","cloudwebrtc",commit_list);
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -49,6 +63,36 @@ app.post('/', function (req, res) {
 app.listen(3000, function () {
   console.log('Example app listening on port 3000!')
 })
+
+// returns a list of repos for a given language
+function makeLangData(language,repo_list,repo_langs) {
+    var dataArray = []
+
+    if(language == "All") {
+      for(key in repo_list) {
+        dataArray.push({"repo_name":repo_list[key].repo_name});
+      }
+    }
+    else {
+
+
+      for(var key in repo_langs) {
+          if(repo_langs[key].lang == language) {
+            //if(!dataArray.includes({"repo_name":repo_langs[key].repo_name})) {
+                dataArray.push({"repo_name":repo_langs[key].repo_name});
+          //  }
+          }
+
+      }
+    }
+
+  //  var dataArray2 = dataArray[0];
+    let dataJSON = JSON.stringify(dataArray);
+    fs.writeFileSync('testLang.json', dataJSON);
+
+
+
+}
 
 
 
@@ -104,8 +148,8 @@ function makeChartData(repo, login, commit_list) {
       chart_json = temp_list;
 
     }
-  //let data = JSON.stringify(chart_json);
-  //fs.writeFileSync('test_1_repo_1_user.json', data);
+  let data = JSON.stringify(chart_json);
+  fs.writeFileSync('testChart.json', data);
     return chart_json;
 }
 
@@ -184,7 +228,7 @@ function makeGraphData(repo, login, commit_list,repo_contributors,repo_list,user
       dataArray.push({"nodes": nodes, "links": links});
       dataArray = dataArray[0];
       let dataJSON = JSON.stringify(dataArray);
-      fs.writeFileSync('testAll.json', dataJSON);
+      fs.writeFileSync('testGraph4.json', dataJSON);
       graph_json = dataArray;
 
 
@@ -233,7 +277,7 @@ function makeGraphData(repo, login, commit_list,repo_contributors,repo_list,user
 
       dataArray = dataArray[0];
    let dataJSON = JSON.stringify(dataArray);
-   fs.writeFileSync('test2.json', dataJSON);
+   fs.writeFileSync('testGraph3.json', dataJSON);
      graph_json = dataArray;
 
 
@@ -280,8 +324,8 @@ function makeGraphData(repo, login, commit_list,repo_contributors,repo_list,user
 
 
       dataArray = dataArray[0];
-  //  let dataJSON = JSON.stringify(dataArray);
-  //  fs.writeFileSync('test2.json', dataJSON);
+   let dataJSON = JSON.stringify(dataArray);
+   fs.writeFileSync('testGraph2.json', dataJSON);
       graph_json = dataArray;
 
 
@@ -304,8 +348,8 @@ function makeGraphData(repo, login, commit_list,repo_contributors,repo_list,user
 
     var dataArray = dataArray[0];
 
-  //  let dataJSON = JSON.stringify(dataArray);
-  // fs.writeFileSync('test1.json', dataJSON);
+   let dataJSON = JSON.stringify(dataArray);
+   fs.writeFileSync('testGraph1.json', dataJSON);
 
     graph_json = dataArray;
 
