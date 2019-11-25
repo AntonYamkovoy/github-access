@@ -11,6 +11,9 @@ let commitData = fs.readFileSync('data/commits.json');
 let repo_contributors = fs.readFileSync('data/repo_contributors.json');
 
 
+
+
+
 let lang_list = JSON.parse(langData);
 let repo_list = JSON.parse(reposData);
 let user_list = JSON.parse(userData);
@@ -24,7 +27,7 @@ var chart_json;
 const app = express()
 
 
-makeGraphData("All","cloudwebrtc",commit_list,repo_cont);
+makeGraphData("All","All",commit_list,repo_cont,repo_list,user_list);
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -107,13 +110,83 @@ function makeChartData(repo, login, commit_list) {
 }
 
 
-function makeGraphData(repo, login, commit_list,repo_contributors) {
+function makeGraphData(repo, login, commit_list,repo_contributors,repo_list,users_list) {
   var graph_json;
 
 
   if(repo.trim() == "All" && login.trim() == "All") { // removing extra whitespace for comparison
       // add all user logins as Node(user), add all repos as Repo(user)
       // for each commit to a repo add a link source : commit.login,  target = commit.repo_name, value
+      var dataArray = []
+      var nodes = []
+      var links = []
+
+
+
+      var usersList = []
+      var reposList = []
+      var temp_index = 0;
+      for(var key in users_list) {
+        usersList.push({"login":users_list[key].login, "index": temp_index, "group": 0});
+        nodes.push({"name":users_list[key].login, "group": 0});
+
+        temp_index++;
+      }
+      for(var key in repo_list) {
+        reposList.push({"repo_name":repo_list[key].repo_name, "index": temp_index, "group": 1});
+        nodes.push({"name":repo_list[key].repo_name, "group": 1});
+        temp_index++;
+      }
+      console.log("created "+temp_index+" user and repo nodes");
+      // each user and repo has an index for links in "usersList" and "reposList"
+      // need to add links for each user counting their commits to each one of their repos and creating that links
+      count =0;
+      for(var key in repo_contributors) {
+          var r = repo_contributors[key].repo_name;
+          var u = repo_contributors[key].login;
+          for(var c in commit_list) {
+            if(commit_list[c].repo_name == r && commit_list[c].login == u) {
+              // found a commit of the user:
+              count++;
+
+            }
+
+          }
+          // found all users commits
+          var commitValue = count;
+          count =0;
+
+          var sourceIndex = 0;
+          var targetIndex =0;
+          for(var user in usersList) {
+            if(usersList[user].login == u) {
+              sourceIndex = usersList[user].index;
+            }
+
+          }
+
+          for(var rep in reposList) {
+            if(reposList[rep].repo_name == r) {
+              targetIndex = reposList[rep].index;
+            }
+
+          }
+
+
+
+          links.push({"source":sourceIndex,"target":targetIndex,"value":commitValue})
+
+
+      }
+
+
+
+      dataArray.push({"nodes": nodes, "links": links});
+      dataArray = dataArray[0];
+      let dataJSON = JSON.stringify(dataArray);
+      fs.writeFileSync('testAll.json', dataJSON);
+      graph_json = dataArray;
+
 
   }
   else if(repo.trim() == "All") {
@@ -148,7 +221,7 @@ function makeGraphData(repo, login, commit_list,repo_contributors) {
       }
 
     }
-    console.log(count)
+    //console.log(count)
 
       // finished pushing all nodes, there are |count| nodes + 1 (the repo)
     for(var i = 1; i <= count ; i++) {
@@ -159,8 +232,8 @@ function makeGraphData(repo, login, commit_list,repo_contributors) {
 
 
       dataArray = dataArray[0];
-   //let dataJSON = JSON.stringify(dataArray);
-   //fs.writeFileSync('test2.json', dataJSON);
+   let dataJSON = JSON.stringify(dataArray);
+   fs.writeFileSync('test2.json', dataJSON);
      graph_json = dataArray;
 
 
@@ -196,7 +269,7 @@ function makeGraphData(repo, login, commit_list,repo_contributors) {
       }
 
     }
-    console.log(count)
+  //  console.log(count)
     nodes.push({"name":repo, "group": 1});
       // finished pushing all nodes, there are |count| nodes + 1 (the repo)
     for(var i = 0; i < count ; i++) {
