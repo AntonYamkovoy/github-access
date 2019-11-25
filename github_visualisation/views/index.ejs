@@ -8,6 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vega@5.8.1"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@4.0.0-beta.12"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.1.0"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="/css/style.css">
   </head>
   <body>
@@ -16,10 +17,10 @@
 
     </div>
     <fieldset>
-    <form action="/" method="post">
+    <form action="/" method="post" name="form">
     <div id="filters" class="filters-class">
           <label for="lang">Language</label>
-           <select id="lang" name="lang" size="1" width="20">
+           <select id="lang" name="lang" size="1" width="20" onchange="getLangSelection()">
              <option value = "All" >All Languages </option>
              <% langList.forEach((item) => { %>
                <option value = "<%= item.lang %>"> <%= item.lang %></option>
@@ -76,10 +77,10 @@
       var yourVlSpec = {
 
          "$schema": "https://vega.github.io/schema/vega/v5.json",
-         "width": 800,
-         "height": 500,
+         "width": 1500,
+         "height": 800,
          "padding": 0,
-         "autosize": "none",
+         "autosize": "pad",
 
          "signals": [
            { "name": "cx", "update": "width / 2" },
@@ -89,7 +90,7 @@
            { "name": "nodeCharge", "value": -30,
              "bind": {"input": "range", "min":-100, "max": 10, "step": 1} },
            { "name": "linkDistance", "value": 30,
-             "bind": {"input": "range", "min": 5, "max": 100, "step": 1} },
+             "bind": {"input": "range", "min": -100, "max": 100, "step": 1} },
            { "name": "static", "value": true,
              "bind": {"input": "checkbox"} },
            {
@@ -133,12 +134,12 @@
          "data": [
            {
              "name": "node-data",
-             "url": "data/miserables.json",
+             "url": "graph",
              "format": {"type": "json", "property": "nodes"}
            },
            {
              "name": "link-data",
-             "url": "data/miserables.json",
+             "url": "graph",
              "format": {"type": "json", "property": "links"}
            }
          ],
@@ -148,7 +149,7 @@
              "name": "color",
              "type": "ordinal",
              "domain": {"data": "node-data", "field": "group"},
-             "range": {"scheme": "category20c"}
+             "range": {"scheme": "darkred"}
            }
          ],
 
@@ -229,29 +230,29 @@
 
 
     "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
-    "width":700, "height":400, "padding": 20,
-    "data": {"url": "data/seattle-weather.csv"},
+    "width":1500, "height":1500, "padding": 20,
+    "data": {"url": "chart"},
     "mark": "bar",
 
     "encoding": {
       "x": {
-        "timeUnit": "month",
-        "field": "date",
+        "timeUnit": "yearmonth",
+        "field": "dat",
         "type": "ordinal",
-        "axis": {"title": "Month of the year"}
+        "axis": {"title": "Timescale"}
       },
       "y": {
         "aggregate": "count",
         "type": "quantitative"
       },
       "color": {
-        "field": "weather",
+        "field": "login",
         "type": "nominal",
         "scale": {
-          "domain": ["sun", "fog", "drizzle", "rain", "snow"],
-          "range": ["#e7ba52", "#c7c7c7", "#aec7e8", "#1f77b4", "#9467bd"]
+          //"domain": ["sun", "fog", "drizzle", "rain", "snow"],
+        //  "range": ["#e7ba52", "#c7c7c7", "#aec7e8", "#1f77b4", "#9467bd"]
         },
-        "legend": {"title": "Weather type"}
+        "legend": {"title": "Users"}
       }
     }
 
@@ -260,9 +261,41 @@
 
 
 
-        vegaEmbed('#vis', yourVlSpec2);
-        vegaEmbed('#chart', yourVlSpec);
-        //vegaEmbed('#vis', yourVlSpec2);
+        vegaEmbed('#vis', yourVlSpec);
+        vegaEmbed('#chart', yourVlSpec2);
+
+
+
+        function getLangSelection() {
+            lang = document.getElementById("lang").value;
+            loadRepos(lang);
+        }
+        function loadRepos(lang) {
+        var myarray = new Array();
+        $.getJSON("repolang?lang="+lang, function(jsonData){
+          document.form.repo.options.length = 0;
+          document.form.repo.options[0] = new Option("All repos    ","All",true, false);
+         $.each(jsonData, function(i,j)
+        { document.form.repo.options[i+1] = new Option(j.repo_name); });});
+        }
+
+
+
+        function getUserSelection() {
+            user = document.getElementById("user").login;
+            loadRepos(user);
+        }
+        function loadRepos(lang) {
+        var myarray = new Array();
+        $.getJSON("repolang?lang="+lang, function(jsonData){
+          document.form.repo.options.length = 0;
+          document.form.repo.options[0] = new Option("All repos    ","All",true, false);
+         $.each(jsonData, function(i,j)
+        { document.form.repo.options[i+1] = new Option(j.repo_name); });});
+        }
+
+
+
 
 
     </script>
