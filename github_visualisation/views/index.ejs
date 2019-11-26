@@ -15,6 +15,7 @@
       stroke: #fff;
       stroke-width: 1.5px;
     }
+
     </style>
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega@5.8.1"></script>
@@ -65,23 +66,61 @@
       <label>Repository: <%= selected_repo %></label>
       <label>User: <%= selected_user %></label>
     </div>
-    <div id="chart"></div>
-    <div id="pi"></div>
-    <div id="graph"></div>
+    <!-- Tab links -->
+    <div class="tab">
+      <button class="tablinks active" onclick="openTab(event, 'Chart')">Commits Chart</button>
+      <button class="tablinks" onclick="openTab(event, 'Radar')">Language Relationship Diagram</button>
+      <button class="tablinks" onclick="openTab(event, 'Graph')">Repository-Users Relationship Graph</button>
+    </div>
 
+    <!-- Tab content -->
+    <div id="Chart" class="tabcontent active" style="display:block">
+      <h3>London</h3>
+      <p>London is the capital city of England.</p>
+      <div id="chart"></div>
+    </div>
 
+    <div id="Radar" class="tabcontent" style="display:none">
+      <h3>Paris</h3>
+      <p>Paris is the capital of France.</p>
+      <div id="pi"></div>
+    </div>
 
+    <div id="Graph" class="tabcontent" style="display:none">
+      <h3>Tokyo</h3>
+      <p>Tokyo is the capital of Japan.</p>
+      <div id="graph"></div>
+    </div>
 
     <script type="text/javascript">
 
+    function openTab(evt, name) {
+      // Declare all variables
+      var i, tabcontent, tablinks;
 
+      // Get all elements with class="tabcontent" and hide them
+      tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+
+      // Get all elements with class="tablinks" and remove the class "active"
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+
+      // Show the current tab, and add an "active" class to the button that opened the tab
+      document.getElementById(name).style.display = "block";
+      evt.currentTarget.className += " active";
+    }
 
       var yourVlSpec = {
 
 
     "$schema": "https://vega.github.io/schema/vega/v3.json",
     "width": 1800,
-    "height": 500,
+    "height": 700,
     "padding": 0,
     "autosize": "pad",
 
@@ -221,12 +260,14 @@
 
   var yourVlSpec3 = {
     "$schema": "https://vega.github.io/schema/vega/v5.json",
-  "width": 600,
-  "height": 700,
-  "padding": 40,
+    "width": 500,
+    "height": 500,
+    "padding": 75,
 
 
-  "autosize": {"type": "none", "contains": "padding"},
+
+
+  "autosize": "none",
 
 
 
@@ -402,7 +443,9 @@
 
 
     "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
-    "width":900, "height":600, "padding": 10,
+    "width": 1500,
+    "height": 550,
+"padding": 0,
     "autosize":"pad",
     "data": {"url": "chart"},
     "mark": "bar",

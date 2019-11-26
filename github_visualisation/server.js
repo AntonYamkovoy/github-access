@@ -61,7 +61,7 @@ app.set('view engine', 'ejs')
 
 app.get('/', function (req, res) {
   var sel_lang = "Go";
-  var sel_repo = "11LiveChat";
+  var sel_repo = "flutter";
   var sel_user = "All";
   chart_json = makeChartData2(sel_repo,sel_user,commit_list);
   graph_json = makeGraphData(sel_repo,sel_user,commit_list,repo_cont,repo_list,user_list);
