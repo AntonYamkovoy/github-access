@@ -23,10 +23,12 @@ let repo_cont = JSON.parse(repo_contributors);
 let test_json = JSON.parse(test_data);
 var chart_json;
 var graph_json;
+var radar_json;
 
 
 //console.log(langList);
 const app = express()
+//makeRadarData("ALl",repo_langs);
 //makeUserData("11LiveChat",user_list,repo_cont); //working
 // make repo list filtered by lang
 //makeLangData("All",repo_list,repo_langs);
@@ -49,8 +51,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs')
 
 app.get('/', function (req, res) {
-  chart_json = makeChartData("buildroot","All",commit_list);
-  graph_json = makeGraphData("buildroot","All",commit_list,repo_cont,repo_list,user_list);
+  chart_json = makeChartData("All","All",commit_list);
+  graph_json = makeGraphData("All","All",commit_list,repo_cont,repo_list,user_list);
+  radar_json = makeRadarData("OCaml",repo_langs);
   res.render('index', {langList: lang_list,reposList:repo_list,userList:user_list});
 })
 app.post('/', function (req, res) {
@@ -65,6 +68,12 @@ app.get('/chart', function(req,res){
 app.get('/graph', function(req,res){
   res.json(graph_json);
 })
+
+app.get('/radar', function(req,res){
+  res.json(radar_json);
+})
+
+
 
 app.get('/repolang', function(req,res){
   param = get_param(req);
@@ -82,6 +91,79 @@ app.get('/repouser', function(req,res){
 app.listen(3000, function () {
   console.log('Example app listening on port 3000!')
 })
+
+
+function makeRadarData(lang, repo_langs) {
+  let map = new Map();
+  var dataArray = []
+  var langsInRepo = []
+  repos_list = makeLangData(lang,repo_list,repo_langs);
+  for(var repo in repo_list) {
+      langsInRepo = []
+      for(var key in repo_langs) {
+        if(repo_langs[key].repo_name == repo_list[repo].repo_name) {
+          langsInRepo.push({"lang":repo_langs[key].lang});
+
+        }
+      }
+
+      //console.log(langsInRepo);
+      // we have langs coming in
+      console.log(langsInRepo);
+      for(i in langsInRepo) {
+
+          if(!map.has(langsInRepo[i].lang )) {
+            map.set(langsInRepo[i].lang, 0);
+          }
+
+          else {
+            map.set(langsInRepo[i].lang, (map.get(langsInRepo[i].lang))+1);
+          }
+      }
+
+
+    }
+
+      const obj = mapToObj(map);
+
+
+  //  console.log(dataJSON);
+    for(key in obj) {
+      dataArray.push({"key":key, "value":obj[key], "category":0});
+
+    }
+
+    specific_repos = makeLangData(lang,repo_list,repo_langs);
+
+
+    return dataArray
+
+
+
+
+
+
+
+
+}
+
+function mapToObj(inputMap) {
+    let obj = {};
+
+    inputMap.forEach(function(value, key){
+        obj[key] = value
+    });
+
+    return obj;
+}
+
+
+
+
+
+
+
+
 
 
 function makeUserData(repo,user_list,repo_contributors) {
@@ -231,13 +313,13 @@ function makeGraphData(repo, login, commit_list,repo_contributors,repo_list,user
       var temp_index = 0;
       for(var key in users_list) {
         usersList.push({"login":users_list[key].login, "index": temp_index, "group": 0});
-        nodes.push({"name":users_list[key].login, "group": 0});
+        nodes.push({"id":users_list[key].login, "group": 0});
 
         temp_index++;
       }
       for(var key in repo_list) {
         reposList.push({"repo_name":repo_list[key].repo_name, "index": temp_index, "group": 1});
-        nodes.push({"name":repo_list[key].repo_name, "group": 1});
+        nodes.push({"id":repo_list[key].repo_name, "group": 1});
         temp_index++;
       }
       console.log("created "+temp_index+" user and repo nodes");
@@ -306,7 +388,8 @@ function makeGraphData(repo, login, commit_list,repo_contributors,repo_list,user
     var count =0;
     var count2 =0;
     var index = repo_contributors.length;
-    nodes.push({"name":login, "group": 0, "index" : count});
+    originalUser = login;
+    nodes.push({"id":login, "group": 0, "index" : count});
     count++;
 
     while(index--) {
@@ -327,7 +410,7 @@ function makeGraphData(repo, login, commit_list,repo_contributors,repo_list,user
 
           */
 
-          nodes.push({"name": repo_contributors[index].repo_name , "group": 1});
+          nodes.push({"id": repo_contributors[index].repo_name , "group": 1});
           var repo_source = count;
           saved.push(repo_source);
           count++;
@@ -335,15 +418,19 @@ function makeGraphData(repo, login, commit_list,repo_contributors,repo_list,user
 
           for(var key in repo_contributors) {
               if(repo_contributors[key].repo_name == repo_contributors[index].repo_name) {
+                if(repo_contributors[key].login  == originalUser) {
+                    continue;
 
+                }
+                else {
                 // find all of repos logins
-                nodes.push({"name":repo_contributors[key].login, "group" : 0});
+                nodes.push({"id":repo_contributors[key].login, "group" : 0});
 
 
                 links.push({"source":repo_source, "target":count, "value":0});
 
                 count++;
-
+              }
               }
           }
           //completed one subtree
@@ -385,14 +472,15 @@ function makeGraphData(repo, login, commit_list,repo_contributors,repo_list,user
     var count =0;
     var count2 =0;
     var index = repo_contributors.length;
-    nodes.push({"name":repo, "group": 1});
+    var originalRepo = repo;
+    nodes.push({"id":repo, "group": 2});
     count++;
 
-    while(index--) {
+    for(var index in repo_contributors) {
       if(repo_contributors[index].repo_name == repo) {
 
 
-          nodes.push({"name": repo_contributors[index].login , "group": 0});
+          nodes.push({"id": repo_contributors[index].login , "group": 0});
           var user_source = count;
           saved.push(user_source);
           count++;
@@ -400,15 +488,19 @@ function makeGraphData(repo, login, commit_list,repo_contributors,repo_list,user
 
           for(var key in repo_contributors) {
               if(repo_contributors[key].login == repo_contributors[index].login) {
+                if(repo_contributors[key].repo_name  == originalRepo) {
+                    continue;
 
-                // find all of repos logins
-                nodes.push({"name":repo_contributors[key].repo_name, "group" : 1});
+                }
+                else {
+                  // find all of repos logins
+                  nodes.push({"id":repo_contributors[key].repo_name, "group" : 1});
 
 
-                links.push({"source":user_source, "target":count, "value":0});
+                  links.push({"source":user_source, "target":count, "value":0});
 
-                count++;
-
+                  count++;
+              }
               }
           }
           //completed one subtree
@@ -440,8 +532,8 @@ function makeGraphData(repo, login, commit_list,repo_contributors,repo_list,user
     var nodes = []
     var links = []
 
-    nodes.push({"name":login, "group": 0});
-    nodes.push({"name":repo, "group": 1});
+    nodes.push({"id":login, "group": 0});
+    nodes.push({"id":repo, "group": 1});
 
     links.push({"source": 0, "target": 1, "value": 1});
 

@@ -5,6 +5,18 @@
   <head>
     <meta charset="utf-8">
     <title>Anton Yamkovoy: Software Engeneering Demo Project</title>
+
+    <style>
+    .links line {
+      stroke: #999;
+      stroke-opacity: 0.6;
+    }
+    .nodes circle {
+      stroke: #fff;
+      stroke-width: 1.5px;
+    }
+    </style>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega@5.8.1"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@4.0.0-beta.12"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.1.0"></script>
@@ -45,186 +57,328 @@
     </fieldset>
     </div>
     <div id="chart"></div>
+    <div id="pi"></div>
+    <div id="graph"></div>
 
-    <div id="vis"></div>
 
 
 
     <script type="text/javascript">
 
 
-/*
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Test</title>
-    <link rel="stylesheet" type="text/css" href="/css/style.css">
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
-  </head>
-  <body>
-    <div class="container">
-      <fieldset>
-        <form action="/" method="post">
-          <input name="city" type="text" class="ghost-input" placeholder="Enter a City" required>
-          <input type="submit" class="ghost-button" value="Get Weather">
-        </form>
-      </fieldset>
-    </div>
-  </body>
-</html>
-*/
-
 
       var yourVlSpec = {
 
-         "$schema": "https://vega.github.io/schema/vega/v5.json",
-         "width": 1920,
-         "height": 800,
-         "padding": 0,
-         "autosize": "pad",
 
-         "signals": [
-           { "name": "cx", "update": "width / 2" },
-           { "name": "cy", "update": "height / 2" },
-           { "name": "nodeRadius", "value": 8,
-             "bind": {"input": "range", "min": 1, "max": 50, "step": 1} },
-           { "name": "nodeCharge", "value": -30,
-             "bind": {"input": "range", "min":-100, "max": 10, "step": 1} },
-           { "name": "linkDistance", "value": 30,
-             "bind": {"input": "range", "min": -100, "max": 100, "step": 1} },
-           { "name": "static", "value": true,
-             "bind": {"input": "checkbox"} },
-           {
-             "description": "State variable for active node fix status.",
-             "name": "fix", "value": false,
-             "on": [
-               {
-                 "events": "symbol:mouseout[!event.buttons], window:mouseup",
-                 "update": "false"
-               },
-               {
-                 "events": "symbol:mouseover",
-                 "update": "fix || true"
-               },
-               {
-                 "events": "[symbol:mousedown, window:mouseup] > window:mousemove!",
-                 "update": "xy()",
-                 "force": true
-               }
-             ]
-           },
-           {
-             "description": "Graph node most recently interacted with.",
-             "name": "node", "value": null,
-             "on": [
-               {
-                 "events": "symbol:mouseover",
-                 "update": "fix === true ? item() : node"
-               }
-             ]
-           },
-           {
-             "description": "Flag to restart Force simulation upon data changes.",
-             "name": "restart", "value": false,
-             "on": [
-               {"events": {"signal": "fix"}, "update": "fix && fix.length"}
-             ]
-           }
-         ],
-
-         "data": [
-           {
-             "name": "node-data",
-             "url": "graph",
-             "format": {"type": "json", "property": "nodes"}
-           },
-           {
-             "name": "link-data",
-             "url": "graph",
-             "format": {"type": "json", "property": "links"}
-           }
-         ],
-
-         "scales": [
-           {
-             "name": "color",
-             "type": "ordinal",
-             "domain": {"data": "node-data", "field": "group"},
-             "range": {"scheme": "darkred"}
-           }
-         ],
-
-         "marks": [
-           {
-             "name": "nodes",
-             "type": "symbol",
-             "zindex": 1,
-
-             "from": {"data": "node-data"},
-             "on": [
-               {
-                 "trigger": "fix",
-                 "modify": "node",
-                 "values": "fix === true ? {fx: node.x, fy: node.y} : {fx: fix[0], fy: fix[1]}"
-               },
-               {
-                 "trigger": "!fix",
-                 "modify": "node", "values": "{fx: null, fy: null}"
-               }
-             ],
-
-             "encode": {
-               "enter": {
-                 "fill": {"scale": "color", "field": "group"},
-                 "stroke": {"value": "white"}
-               },
-               "update": {
-                 "size": {"signal": "2 * nodeRadius * nodeRadius"},
-                 "cursor": {"value": "pointer"}
-               }
-             },
-
-             "transform": [
-               {
-                 "type": "force",
-                 "iterations": 300,
-                 "restart": {"signal": "restart"},
-                 "static": {"signal": "static"},
-                 "signal": "force",
-                 "forces": [
-                   {"force": "center", "x": {"signal": "cx"}, "y": {"signal": "cy"}},
-                   {"force": "collide", "radius": {"signal": "nodeRadius"}},
-                   {"force": "nbody", "strength": {"signal": "nodeCharge"}},
-                   {"force": "link", "links": "link-data", "distance": {"signal": "linkDistance"}}
-                 ]
-               }
-             ]
-           },
-           {
-             "type": "path",
-             "from": {"data": "link-data"},
-             "interactive": false,
-             "encode": {
-               "update": {
-                 "stroke": {"value": "#ccc"},
-                 "strokeWidth": {"value": 0.5}
-               }
-             },
-             "transform": [
-               {
-                 "type": "linkpath",
-                 "require": {"signal": "force"},
-                 "shape": "line",
-                 "sourceX": "datum.source.x", "sourceY": "datum.source.y",
-                 "targetX": "datum.target.x", "targetY": "datum.target.y"
-               }
-             ]
-           }
-         ]
-
+    "$schema": "https://vega.github.io/schema/vega/v3.json",
+    "width": 1800,
+    "height": 500,
+    "padding": 0,
+    "autosize": "pad",
+    "signals": [
+      {"name": "cx", "update": "width / 2"},
+      {"name": "cy", "update": "height / 2"},
+      {
+        "name": "nodeRadius",
+        "value": 8,
+        "bind": {"input": "range", "min": 1, "max": 50, "step": 1}
+      },
+      {
+        "name": "nodeCharge",
+        "value": -30,
+        "bind": {"input": "range", "min": -100, "max": 10, "step": 1}
+      },
+      {
+        "name": "linkDistance",
+        "value": 30,
+        "bind": {"input": "range", "min": 5, "max": 100, "step": 1}
+      },
+      {"name": "static", "value": true, "bind": {"input": "checkbox"}},
+      {
+        "description": "State variable for active node fix status.",
+        "name": "fix",
+        "value": 0,
+        "on": [
+          {
+            "events": "symbol:mouseout[!event.buttons], window:mouseup",
+            "update": "0"
+          },
+          {"events": "symbol:mouseover", "update": "fix || 1"},
+          {
+            "events": "[symbol:mousedown, window:mouseup] > window:mousemove!",
+            "update": "2",
+            "force": true
+          }
+        ]
+      },
+      {
+        "description": "Graph node most recently interacted with.",
+        "name": "node",
+        "value": null,
+        "on": [
+          {"events": "symbol:mouseover", "update": "fix === 1 ? item() : node"}
+        ]
+      },
+      {
+        "description": "Flag to restart Force simulation upon data changes.",
+        "name": "restart",
+        "value": false,
+        "on": [{"events": {"signal": "fix"}, "update": "fix > 1"}]
+      }
+    ],
+    "data": [
+      {
+        "name": "node-data",
+        "url": "graph",
+        "format": {"type": "json", "property": "nodes"}
+      },
+      {
+        "name": "link-data",
+        "url": "graph",
+        "format": {"type": "json", "property": "links"}
+      }
+    ],
+    "scales": [
+      {"name": "color", "type": "ordinal", "range": {"scheme": "dark2"}}
+    ],
+    "marks": [
+      {
+        "name": "nodes",
+        "type": "symbol",
+        "zindex": 1,
+        "from": {"data": "node-data"},
+        "on": [
+          {
+            "trigger": "fix",
+            "modify": "node",
+            "values": "fix === 1 ? {fx:node.x, fy:node.y} : {fx:x(), fy:y()}"
+          },
+          {"trigger": "!fix", "modify": "node", "values": "{fx: null, fy: null}"}
+        ],
+        "encode": {
+          "enter": {
+            "fill": {"scale": "color", "field": "group"},
+            "stroke": {"value": "white"},
+            "tooltip": {"signal": "datum.id"}
+          },
+          "update": {
+            "size": {"signal": "2 * nodeRadius * nodeRadius"},
+            "cursor": {"value": "pointer"}
+          }
+        },
+        "transform": [
+          {
+            "type": "force",
+            "iterations": 300,
+            "restart": {"signal": "restart"},
+            "static": {"signal": "static"},
+            "forces": [
+              {"force": "center", "x": {"signal": "cx"}, "y": {"signal": "cy"}},
+              {"force": "collide", "radius": {"signal": "nodeRadius"}},
+              {"force": "nbody", "strength": {"signal": "nodeCharge"}},
+              {
+                "force": "link",
+                "links": "link-data",
+                "distance": {"signal": "linkDistance"}
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "path",
+        "from": {"data": "link-data"},
+        "interactive": false,
+        "encode": {
+          "update": {"stroke": {"value": "#ccc"}, "strokeWidth": {"value": 0.5}}
+        },
+        "transform": [
+          {
+            "type": "linkpath",
+            "shape": "line",
+            "sourceX": "datum.source.x",
+            "sourceY": "datum.source.y",
+            "targetX": "datum.target.x",
+            "targetY": "datum.target.y"
+          }
+        ]
+      }
+    ],
+    "config": {}
 
   };
+
+  var yourVlSpec3 = {
+    "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "width": 500,
+  "height": 600,
+  "padding": 40,
+  "autosize": {"type": "none", "contains": "padding"},
+
+  "signals": [
+    {"name": "radius", "update": "width / 2"}
+  ],
+
+  "data": [
+    {
+      "name": "table",
+      "url":"radar"
+    },
+    {
+      "name": "keys",
+      "source": "table",
+      "transform": [
+        {
+          "type": "aggregate",
+          "groupby": ["key"]
+        }
+      ]
+    }
+  ],
+
+  "scales": [
+    {
+      "name": "angular",
+      "type": "point",
+      "range": {"signal": "[-PI, PI]"},
+      "padding": 0.5,
+      "domain": {"data": "table", "field": "key"}
+    },
+    {
+      "name": "radial",
+      "type": "linear",
+      "range": {"signal": "[0, radius]"},
+      "zero": true,
+      "nice": false,
+      "domain": {"data": "table", "field": "value"},
+      "domainMin": 0
+    },
+    {
+      "name": "color",
+      "type": "ordinal",
+      "domain": {"data": "table", "field": "category"},
+      "range": {"scheme": "category10"}
+    }
+  ],
+
+  "encode": {
+    "enter": {
+      "x": {"signal": "radius"},
+      "y": {"signal": "radius"}
+    }
+  },
+
+  "marks": [
+    {
+      "type": "group",
+      "name": "categories",
+      "zindex": 1,
+      "from": {
+        "facet": {"data": "table", "name": "facet", "groupby": ["category"]}
+      },
+      "marks": [
+        {
+          "type": "line",
+          "name": "category-line",
+          "from": {"data": "facet"},
+          "encode": {
+            "enter": {
+              "interpolate": {"value": "linear-closed"},
+              "x": {"signal": "scale('radial', datum.value) * cos(scale('angular', datum.key))"},
+              "y": {"signal": "scale('radial', datum.value) * sin(scale('angular', datum.key))"},
+              "stroke": {"scale": "color", "field": "category"},
+              "strokeWidth": {"value": 1},
+              "fill": {"scale": "color", "field": "category"},
+              "fillOpacity": {"value": 0.1}
+            }
+          }
+        },
+        {
+          "type": "text",
+          "name": "value-text",
+          "from": {"data": "category-line"},
+          "encode": {
+            "enter": {
+              "x": {"signal": "datum.x"},
+              "y": {"signal": "datum.y"},
+              "text": {"signal": "datum.datum.value"},
+              "align": {"value": "center"},
+              "baseline": {"value": "middle"},
+              "fill": {"value": "black"}
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "rule",
+      "name": "radial-grid",
+      "from": {"data": "keys"},
+      "zindex": 0,
+      "encode": {
+        "enter": {
+          "x": {"value": 0},
+          "y": {"value": 0},
+          "x2": {"signal": "radius * cos(scale('angular', datum.key))"},
+          "y2": {"signal": "radius * sin(scale('angular', datum.key))"},
+          "stroke": {"value": "lightgray"},
+          "strokeWidth": {"value": 1}
+        }
+      }
+    },
+    {
+      "type": "text",
+      "name": "key-label",
+      "from": {"data": "keys"},
+      "zindex": 1,
+      "encode": {
+        "enter": {
+          "x": {"signal": "(radius + 5) * cos(scale('angular', datum.key))"},
+          "y": {"signal": "(radius + 5) * sin(scale('angular', datum.key))"},
+          "text": {"field": "key"},
+          "align": [
+            {
+              "test": "abs(scale('angular', datum.key)) > PI / 2",
+              "value": "right"
+            },
+            {
+              "value": "left"
+            }
+          ],
+          "baseline": [
+            {
+              "test": "scale('angular', datum.key) > 0", "value": "top"
+            },
+            {
+              "test": "scale('angular', datum.key) == 0", "value": "middle"
+            },
+            {
+              "value": "bottom"
+            }
+          ],
+          "fill": {"value": "black"},
+          "fontWeight": {"value": "bold"}
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "outer-line",
+      "from": {"data": "radial-grid"},
+      "encode": {
+        "enter": {
+          "interpolate": {"value": "linear-closed"},
+          "x": {"field": "x2"},
+          "y": {"field": "y2"},
+          "stroke": {"value": "lightgray"},
+          "strokeWidth": {"value": 1}
+        }
+      }
+    }
+  ]
+
+};
+
 
 
 
@@ -232,7 +386,8 @@
 
 
     "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
-    "width":1000, "height":600, "padding": 100,
+    "width":1000, "height":600, "padding": 10,
+    "autosize":"pad",
     "data": {"url": "chart"},
     "mark": "bar",
 
@@ -267,8 +422,12 @@
 
 
 
+
+
+
        vegaEmbed('#chart', yourVlSpec2);
-       vegaEmbed('#vis', yourVlSpec);
+       vegaEmbed('#pi', yourVlSpec3);
+       vegaEmbed('#graph', yourVlSpec);
 
 
 
