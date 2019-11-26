@@ -75,6 +75,8 @@
     "height": 500,
     "padding": 0,
     "autosize": "pad",
+
+
     "signals": [
       {"name": "cx", "update": "width / 2"},
       {"name": "cy", "update": "height / 2"},
@@ -210,10 +212,15 @@
 
   var yourVlSpec3 = {
     "$schema": "https://vega.github.io/schema/vega/v5.json",
-  "width": 500,
-  "height": 600,
+  "width": 600,
+  "height": 700,
   "padding": 40,
+
+
   "autosize": {"type": "none", "contains": "padding"},
+
+
+
 
   "signals": [
     {"name": "radius", "update": "width / 2"}
@@ -386,7 +393,7 @@
 
 
     "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
-    "width":1000, "height":600, "padding": 10,
+    "width":900, "height":600, "padding": 10,
     "autosize":"pad",
     "data": {"url": "chart"},
     "mark": "bar",
@@ -400,7 +407,8 @@
       },
       "y": {
         "aggregate": "count",
-        "type": "quantitative"
+        "type": "quantitative",
+        "label" : "Combined Commits"
       },
       "color": {
         "field": "login",

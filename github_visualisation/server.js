@@ -51,9 +51,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs')
 
 app.get('/', function (req, res) {
-  chart_json = makeChartData("All","All",commit_list);
-  graph_json = makeGraphData("All","All",commit_list,repo_cont,repo_list,user_list);
-  radar_json = makeRadarData("OCaml",repo_langs);
+  chart_json = makeChartData("plugins","All",commit_list);
+  graph_json = makeGraphData("plugins","All",commit_list,repo_cont,repo_list,user_list);
+  radar_json = makeRadarData("C++",repo_langs);
   res.render('index', {langList: lang_list,reposList:repo_list,userList:user_list});
 })
 app.post('/', function (req, res) {
