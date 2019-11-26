@@ -47,19 +47,35 @@ const app = express()
 //makeChartData("11LiveChat","cloudwebrtc",commit_list);
 
 app.use(express.static('public'));
-app.use(bodyParser.urlencoded({ extended: true }));
+//app.use(express.json());
+//app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+
+// Parse JSON bodies (as sent by API clients)
+//app.use(express.json());
+var qs = require('querystring');
+
 app.set('view engine', 'ejs')
 
 app.get('/', function (req, res) {
-  chart_json = makeChartData("plugins","All",commit_list);
-  graph_json = makeGraphData("plugins","All",commit_list,repo_cont,repo_list,user_list);
-  radar_json = makeRadarData("C++",repo_langs);
-  res.render('index', {langList: lang_list,reposList:repo_list,userList:user_list});
+  var sel_lang = "Go";
+  var sel_repo = "11LiveChat";
+  var sel_user = "All";
+  chart_json = makeChartData2(sel_repo,sel_user,commit_list);
+  graph_json = makeGraphData(sel_repo,sel_user,commit_list,repo_cont,repo_list,user_list);
+  radar_json = makeRadarData(sel_lang,repo_langs);
+  res.render('index', {langList: lang_list,reposList:repo_list,userList:user_list,selected_lang:sel_lang, selected_repo:sel_repo, selected_user:sel_user});
 })
 app.post('/', function (req, res) {
-  chart_json = makeChartData("All","All",commit_list);
-  //graph_json = makeGraphData("All","All",commit_list,repo_cont,repo_list,user_list);
-  res.render('index', {langList: lang_list,reposList:repo_list,userList:user_list});
+  chart_json = makeChartData2(req.body["repo"],req.body["user"],commit_list);
+  graph_json = makeGraphData(req.body["repo"],req.body["user"],commit_list,repo_cont,repo_list,user_list);
+  radar_json = makeRadarData(req.body["lang"],repo_langs);
+    console.log(req.body["lang"]);
+    console.log(req.body["repo"]);
+    console.log(req.body["user"]);
+  res.render('index', {langList: lang_list,reposList:repo_list,userList:user_list, selected_lang:req.body["lang"], selected_repo:req.body["repo"], selected_user:req.body["user"]});
 })
 app.get('/chart', function(req,res){
   res.json(chart_json);
@@ -245,11 +261,11 @@ function get_param(req){
 function makeChartData(repo, login, commit_list) {
     var chart_json;
     var temp_list = commit_list;
-    if(repo.trim() == "All" && login.trim() == "All") { // removing extra whitespace for comparison
+    if(repo == "All" && login == "All") { // removing extra whitespace for comparison
         chart_json = commit_list;
 
     }
-    else if(repo.trim() == "All") {
+    else if(repo == "All" && login != "All") {
       // all repos of one user case
       var i =temp_list.length;
       while(i--) {
@@ -263,7 +279,7 @@ function makeChartData(repo, login, commit_list) {
 
 
     }
-    else if(login.trim() == "All") {
+    else if(login == "All"&& repo != "All") {
       // all users 1 repo case
 
       var i =temp_list.length;
@@ -294,9 +310,55 @@ function makeChartData(repo, login, commit_list) {
       chart_json = temp_list;
 
     }
-  let data = JSON.stringify(chart_json);
+  //let data = JSON.stringify(chart_json);
   //fs.writeFileSync('testChart.json', data);
   return chart_json;
+}
+
+
+function makeChartData2(repo, login, commit_list) {
+    if(repo.trim() == "All" && login.trim() == "All") { return commit_list }
+
+
+
+
+      if(repo.trim() == "All") {
+          var dataArray = []
+          for(var key in commit_list) {
+            if(commit_list[key].login == login) {
+              // found users commit into any repos
+              dataArray.push({"login":login,"repo_name":commit_list[key].repo_name,"dat":commit_list[key].dat});
+            }
+          }
+          return dataArray;
+
+        }
+
+
+    if(login.trim() == "All") {
+      var dataArray = []
+      for(var key in commit_list) {
+        if(commit_list[key].repo_name == repo) {
+          // found users commit into any repos
+          dataArray.push({"login":commit_list[key].login,"repo_name":repo,"dat":commit_list[key].dat});
+        }
+      }
+      return dataArray;
+
+    }
+    else {
+      var dataArray = []
+      for(var key in commit_list) {
+        if(commit_list[key].login == login && commit_list[key].repo_name == repo) {
+          // found users commit into any repos
+          dataArray.push({"login":login,"repo_name":commit_list[key].repo_name,"dat":commit_list[key].dat});
+        }
+      }
+      return dataArray;
+
+    }
+
+
 }
 
 

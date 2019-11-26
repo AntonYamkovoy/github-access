@@ -31,6 +31,9 @@
     <fieldset>
     <form action="/" method="post" name="form">
     <div id="filters" class="filters-class">
+          <hidden name="lang_value" id="lang_value" value="All">
+          <hidden name="repo_value" id="repo_value" value="All">
+          <hidden name="user_value" id="user_value" value="All">
           <label for="lang">Language</label>
            <select id="lang" name="lang" size="1" width="20" onchange="getLangSelection()">
              <option value = "All" >All Languages </option>
@@ -46,7 +49,7 @@
         <% }); %>
          </select>
       <label for="user">User</label>
-      <select id="user" name="user" size="1" width="40">
+      <select id="user" name="user" size="1" width="40" onchange="getUserSelection()">
         <option value = "All" >All users</option>
           <% userList.forEach((item) => { %>
           <option value = "<%= item.login %>"> <%= item.login %></option>
@@ -55,6 +58,12 @@
       <input type="submit" class="go-button" value="Update">
       </form>
     </fieldset>
+    </div>
+    <div id="selected_values">
+      <h3>Selected:</h3>
+      <label>Language: <%= selected_lang %></label>
+      <label>Repository: <%= selected_repo %></label>
+      <label>User: <%= selected_user %></label>
     </div>
     <div id="chart"></div>
     <div id="pi"></div>
@@ -442,6 +451,7 @@
 
         function getLangSelection() {
             lang = document.getElementById("lang").value;
+            document.getElementById("lang_value").value = lang;
             loadRepos(lang);
         }
         function loadRepos(lang) {
@@ -457,6 +467,7 @@
 
         function getRepoSelection() {
             repo = document.getElementById("repo").value;
+            document.getElementById("repo_value").value = repo;
             loadUsers(repo);
         }
         function loadUsers(repo) {
@@ -468,6 +479,10 @@
         { document.form.user.options[i+1] = new Option(j.login); });});
         }
 
+        function getUserSelection() {
+            user = document.getElementById("user").value;
+            document.getElementById("user_value").value = user;
+        }
 
 
 
