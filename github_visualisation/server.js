@@ -49,13 +49,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs')
 
 app.get('/', function (req, res) {
-//  chart_json = makeChartData("All","All",commit_list);
-  //graph_json = makeGraphData("All","All",commit_list,repo_cont,repo_list,user_list);
+  chart_json = makeChartData("buildroot","All",commit_list);
+  graph_json = makeGraphData("buildroot","All",commit_list,repo_cont,repo_list,user_list);
   res.render('index', {langList: lang_list,reposList:repo_list,userList:user_list});
 })
 app.post('/', function (req, res) {
   chart_json = makeChartData("All","All",commit_list);
-  graph_json = makeGraphData("All","All",commit_list,repo_cont,repo_list,user_list);
+  //graph_json = makeGraphData("All","All",commit_list,repo_cont,repo_list,user_list);
   res.render('index', {langList: lang_list,reposList:repo_list,userList:user_list});
 })
 app.get('/chart', function(req,res){
@@ -208,8 +208,8 @@ function makeChartData(repo, login, commit_list) {
 
     }
   let data = JSON.stringify(chart_json);
-  fs.writeFileSync('testChart.json', data);
-    return chart_json;
+  //fs.writeFileSync('testChart.json', data);
+  return chart_json;
 }
 
 
@@ -245,8 +245,10 @@ function makeGraphData(repo, login, commit_list,repo_contributors,repo_list,user
       // need to add links for each user counting their commits to each one of their repos and creating that links
       count =0;
       for(var key in repo_contributors) {
+
           var r = repo_contributors[key].repo_name;
           var u = repo_contributors[key].login;
+          /*
           for(var c in commit_list) {
             if(commit_list[c].repo_name.trim() == r.trim() && commit_list[c].login.trim() == u.trim()) {
               // found a commit of the user:
@@ -255,9 +257,10 @@ function makeGraphData(repo, login, commit_list,repo_contributors,repo_list,user
             }
 
           }
+          */
           // found all users commits
 
-          var commitValue = count;
+
           count =0;
 
           var sourceIndex = 0;
@@ -278,7 +281,7 @@ function makeGraphData(repo, login, commit_list,repo_contributors,repo_list,user
 
 
 
-          links.push({"source":sourceIndex,"target":targetIndex,"value":commitValue})
+          links.push({"source":sourceIndex,"target":targetIndex,"value":0})
         //  console.log(commitValue)
 
 
@@ -298,17 +301,18 @@ function makeGraphData(repo, login, commit_list,repo_contributors,repo_list,user
     var dataArray = []
     var nodes = []
     var links = []
+    var saved = []
 
-    var commitList = []
     var count =0;
     var count2 =0;
     var index = repo_contributors.length;
-    nodes.push({"name":login, "group": 0});
+    nodes.push({"name":login, "group": 0, "index" : count});
+    count++;
 
     while(index--) {
       if(repo_contributors[index].login == login) {
           // found repo of given
-
+          /*
           for(var key in commit_list) {
             if(commit_list[key].repo_name == repo_contributors[index].repo_name && commit_list[key].login == login) {
               // found users commit in given repo
@@ -321,22 +325,48 @@ function makeGraphData(repo, login, commit_list,repo_contributors,repo_list,user
           commitList[count] = count2;
           count2 =0
 
-
+          */
 
           nodes.push({"name": repo_contributors[index].repo_name , "group": 1});
+          var repo_source = count;
+          saved.push(repo_source);
           count++;
+
+
+          for(var key in repo_contributors) {
+              if(repo_contributors[key].repo_name == repo_contributors[index].repo_name) {
+
+                // find all of repos logins
+                nodes.push({"name":repo_contributors[key].login, "group" : 0});
+
+
+                links.push({"source":repo_source, "target":count, "value":0});
+
+                count++;
+
+              }
+          }
+          //completed one subtree
       }
+      // all subtrees completed links from inital user to it's repos left
 
     }
-    //console.log(count)
 
+
+    //console.log(count)
+/*
       // finished pushing all nodes, there are |count| nodes + 1 (the repo)
     for(var i = 1; i <= count ; i++) {
         links.push({"source":0, "target":i, "value":commitList[i-1]});
     }
 
     dataArray.push({"nodes": nodes, "links": links});
+*/
 
+    for(s in saved) {
+      links.push({"source":0, "target":saved[s], "value":0});
+    }
+    dataArray.push({"nodes": nodes, "links": links});
 
       dataArray = dataArray[0];
    let dataJSON = JSON.stringify(dataArray);
@@ -346,51 +376,59 @@ function makeGraphData(repo, login, commit_list,repo_contributors,repo_list,user
 
   }
   else if(login.trim() == "All") {
+
     var dataArray = []
     var nodes = []
     var links = []
+    var saved = []
 
-    var commitList = []
     var count =0;
     var count2 =0;
     var index = repo_contributors.length;
+    nodes.push({"name":repo, "group": 1});
+    count++;
+
     while(index--) {
       if(repo_contributors[index].repo_name == repo) {
-          // found user that commits in given repo
-
-          for(var key in commit_list) {
-            if(commit_list[key].login == repo_contributors[index].login && commit_list[key].repo_name == repo) {
-              // found users commit in given repo
-              count2++;
-
-            }
-
-          }
-
-          commitList[count] = count2;
-          count2 =0
 
 
           nodes.push({"name": repo_contributors[index].login , "group": 0});
+          var user_source = count;
+          saved.push(user_source);
           count++;
+
+
+          for(var key in repo_contributors) {
+              if(repo_contributors[key].login == repo_contributors[index].login) {
+
+                // find all of repos logins
+                nodes.push({"name":repo_contributors[key].repo_name, "group" : 1});
+
+
+                links.push({"source":user_source, "target":count, "value":0});
+
+                count++;
+
+              }
+          }
+          //completed one subtree
       }
+      // all subtrees completed links from inital user to it's repos left
 
     }
-  //  console.log(count)
-    nodes.push({"name":repo, "group": 1});
-      // finished pushing all nodes, there are |count| nodes + 1 (the repo)
-    for(var i = 0; i < count ; i++) {
-        links.push({"source":i, "target":count, "value":commitList[i]});
-    }
 
+
+
+
+    for(s in saved) {
+      links.push({"source":0, "target":saved[s], "value":0});
+    }
     dataArray.push({"nodes": nodes, "links": links});
-
 
       dataArray = dataArray[0];
    let dataJSON = JSON.stringify(dataArray);
-   fs.writeFileSync('testGraph2.json', dataJSON);
-      graph_json = dataArray;
-
+   fs.writeFileSync('testGraph3.json', dataJSON);
+     graph_json = dataArray;
 
 
 
