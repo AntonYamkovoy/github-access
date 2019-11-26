@@ -95,6 +95,7 @@ app.listen(3000, function () {
 
 function makeRadarData(lang, repo_langs) {
   let map = new Map();
+  let resMap = new Map();
   var dataArray = []
   var langsInRepo = []
   repos_list = makeLangData(lang,repo_list,repo_langs);
@@ -106,9 +107,6 @@ function makeRadarData(lang, repo_langs) {
 
         }
       }
-
-      //console.log(langsInRepo);
-      // we have langs coming in
       console.log(langsInRepo);
       for(i in langsInRepo) {
 
@@ -120,31 +118,38 @@ function makeRadarData(lang, repo_langs) {
             map.set(langsInRepo[i].lang, (map.get(langsInRepo[i].lang))+1);
           }
       }
-
-
     }
-
-      const obj = mapToObj(map);
-
-
-  //  console.log(dataJSON);
-    for(key in obj) {
-      dataArray.push({"key":key, "value":obj[key], "category":0});
-
-    }
-
+    const obj = mapToObj(map);
+    for(key in obj) { dataArray.push({"key":key, "value":obj[key], "category":0});  }
     specific_repos = makeLangData(lang,repo_list,repo_langs);
+    desiredLangs = []
+    //console.log(specific_repos);
+    for(i in repos_list) {
+      for(j in repo_langs) {
+          if(repos_list[i].repo_name == repo_langs[j].repo_name) {
+            desiredLangs.push(repo_langs[j].lang)
+          }
+      }
+    }
+    var resultArray = []
+
+    uniqueLangs = desiredLangs.reduce(function(a,b){if(a.indexOf(b)<0)a.push(b);return a;},[]);
+
+    console.log("DesiredLangs "+ uniqueLangs);
 
 
-    return dataArray
+    for(var d in uniqueLangs) {
+        for(var k in dataArray) {
+            if(dataArray[k].key == uniqueLangs[d]) {
+              // add to final list
+              resultArray.push({"key":dataArray[k].key,"value":dataArray[k].value,"category":0});
 
+            }
 
+        }
 
-
-
-
-
-
+    }
+    return resultArray;
 }
 
 function mapToObj(inputMap) {
