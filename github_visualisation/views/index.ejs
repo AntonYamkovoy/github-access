@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Anton Yamkovoy: Software Engeneering Demo Project</title>
+    <title>Anton Yamkovoy: Software Engineering Demo</title>
 
     <style>
     .links line {
@@ -26,42 +26,46 @@
   </head>
   <body>
 
-    <fieldset>
     <form action="/" method="post" name="form">
-    <div id="filters" class="filters-class">
+    <div id="filters" class="form-style-5">
+    <h2>Github data analysis </h2>
           <hidden name="lang_value" id="lang_value" value="All">
           <hidden name="repo_value" id="repo_value" value="All">
           <hidden name="user_value" id="user_value" value="All">
-          <label for="lang">Language</label>
+    <fieldset>
+          <legend><span class="number">1</span>Language:</legend>
            <select id="lang" name="lang" size="1" width="20" onchange="getLangSelection()">
              <option value = "All" >All Languages </option>
              <% langList.forEach((item) => { %>
                <option value = "<%= item.lang %>"> <%= item.lang %></option>
              <% }); %>
            </select>
-          <label for="repo">Repository</label>
+          <legend><span class="number">2</span>Repository:</legend>
            <select id="repo" name="repo" size="1" width="40" onchange="getRepoSelection()">
             <option value = "All" >All repos </option>
             <% reposList.forEach((item) => { %>
           <option value = "<%= item.repo_name %>"> <%= item.repo_name %></option>
         <% }); %>
          </select>
-      <label for="user">User</label>
+      <legend><span class="number">3</span>User:</legend>
       <select id="user" name="user" size="1" width="40" onchange="getUserSelection()">
         <option value = "All" >All users</option>
           <% userList.forEach((item) => { %>
           <option value = "<%= item.login %>"> <%= item.login %></option>
         <% }); %>
       </select>
-      <input type="submit" class="go-button" value="Update">
-      </form>
+      <legend><span class="number">4</span>Select</legend>
+      <input type="submit" value="Apply">
     </fieldset>
+      </form>
+
     </div>
-    <div id="selected_values">
-      <h3>Selected:</h3>
-      <label>Language: <%= selected_lang %></label>
-      <label>Repository: <%= selected_repo %></label>
-      <label>User: <%= selected_user %></label>
+    <div id="selected_values" class="form-style-5">
+      <fieldset>
+      <legend><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>Language:</legend><textarea name="selected_lang" readonly><%= selected_lang %></textarea>
+      <legend><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>Repository:</legend><textarea name="selected_repo" readonly><%= selected_repo %></textarea>
+      <legend><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>User:</legend><textarea name="selected_user" readonly><%= selected_user %></textarea>
+    </fieldset>
     </div>
     <!-- Tab links -->
     <div class="tab">
