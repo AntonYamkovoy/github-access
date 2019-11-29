@@ -200,12 +200,11 @@ reposList = ["flutter-webrtc","flutter_barcode_reader","flutter-nfc-reader","flu
 
 
 
-client = pymongo.MongoClient("mongodb+srv://Anton:mongo@sweng-cqjlw.mongodb.net/test?retryWrites=true&w=majority")
+//client = pymongo.MongoClient("mongodb+srv://Anton:mongo@sweng-cqjlw.mongodb.net/test?retryWrites=true&w=majority")
 
 
-g2 = Github("4a78d9e6a5a0602050ccf60acf08cda73c530e96")
-#  4a78d9e6a5a0602050ccf60acf08cda73c530e96 github key
-#950c09e4661866e9e71bf1ee7fb8939c3a0b8d41 sweng 2
+
+
 
 
 
