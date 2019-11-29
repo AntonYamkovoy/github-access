@@ -200,11 +200,11 @@ reposList = ["flutter-webrtc","flutter_barcode_reader","flutter-nfc-reader","flu
 
 
 
-//client = pymongo.MongoClient("mongodb+srv://Anton:mongo@sweng-cqjlw.mongodb.net/test?retryWrites=true&w=majority")
+//client = pymongo.MongoClient("mongodb+srv://Anton:<password>@sweng-cqjlw.mongodb.net/test?retryWrites=true&w=majority")
 
 
 
-
+g2 = "your api key"
 
 
 
