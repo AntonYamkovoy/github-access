@@ -10,7 +10,7 @@ and the data is logged into the database.
 
  ![allall](gifs/gif1.gif)
  
-
+The dataset used in this project was collected using the scraper in github-access part1, the data is around 50k commits from a set of users and repos, all related somewhere around flutter.
 
 Consists of 3 tabs of visualisations:
 
