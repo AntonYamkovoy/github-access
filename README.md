@@ -24,3 +24,11 @@ Consists of 3 tabs of visualisations:
   ![Chart demo](gifs/graph_default.png)
    
    
+**Gif Examples of site**
+
+Animation of force directed layout:
+![gif force](gifs/gif2.gif)     
+
+Label interaction force directed layout:
+
+ ![gif_label](gifs/gif3.gif)
