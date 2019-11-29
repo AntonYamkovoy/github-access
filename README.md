@@ -32,3 +32,11 @@ Animation of force directed layout:
 Label interaction force directed layout:
 
  ![gif_label](gifs/gif3.gif)
+ 
+All users, All repos graph
+ ![allall](gifs/graph_all.png)
+ 
+  
+All users, All repos Chart
+ ![allall](gifs/commits_all.png)
+
