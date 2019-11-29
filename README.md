@@ -8,6 +8,10 @@ and the data is logged into the database.
 
 **Github visualisation part 2:**
 
+ ![allall](gifs/gif1.gif)
+ 
+
+
 Consists of 3 tabs of visualisations:
 
 1. Commits over time stacked per person, can be filtered by language, repository and user, with cases for all languages
@@ -37,6 +41,14 @@ All users, All repos graph
  ![allall](gifs/graph_all.png)
  
   
-All users, All repos Chart
- ![allall](gifs/commits_all.png)
+ 
+ **Gif Examples full run through**
+ 
+ 
+ ![allall](gifs/gif4.gif)
+ 
+  ![allall](gifs/gif5_single_user.gif)
+  
+   ![allall](gifs/gif5_user_all_repos.gif)
+ 
 
